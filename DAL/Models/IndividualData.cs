@@ -19,6 +19,9 @@ namespace DAL.Models
             DateOfBirth = individual.DateOfBirth;
         }
 
+        [JsonProperty(PropertyName = "id")]
+        public Guid Id { get; set; }
+
         [JsonProperty(PropertyName = "email")]
         public string Email { get; set; }
 

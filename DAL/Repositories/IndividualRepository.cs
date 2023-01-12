@@ -19,6 +19,7 @@ namespace DAL.Repositories
         {
             var individual = new IndividualData()
             {
+                Id = Guid.NewGuid(),
                 Email = email,
                 Name = name,
                 PhoneNumber = phoneNumber,

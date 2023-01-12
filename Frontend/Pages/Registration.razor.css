@@ -3,6 +3,7 @@
     width: fit-content;
     height: 100vh;
     flex-direction: column;
+    overflow: auto;
     background: linear-gradient(180deg, #17224D 0%, #156E93 100%);
 }
 
@@ -36,7 +37,11 @@
 .wrapper-div-middle {
     display: flex;
     flex-direction: row;
+    flex: auto;
+    flex-wrap: wrap;
     justify-content: space-evenly;
+    justify-items: center;
+    justify-self: center;
     width: 100vw;
     height: 80vh;
     padding-bottom: 5vh;
@@ -46,40 +51,36 @@
     gap: 6vw;
 }
 
-a {
-    text-decoration: none;
-    height: 70vh;
-    width: 100vw;
-}
-
 .individual {
     display: flex;
-    width: 100vw;
     height: 70vh;
     background-repeat: no-repeat;
     background-image: url("./images/Individual.svg");
     background-position: center;
-    background-size: 100% 100%;
 }
 
 .medical-practitioner {
     display: flex;
-    width: 100vw;
     height: 70vh;
     background-repeat: no-repeat;
     background-image: url("./images/Medical Practitioner.svg");
     background-position: center;
     overflow: auto;
-    background-size: 100% 100%;
 }
 
 .healthcare-centre {
     display: flex;
-    width: 100vw;
     height: 70vh;
     background-repeat: no-repeat;
     background-image: url("./images/Healthcare Centre.svg");
     background-position: center;
     overflow: auto;
-    background-size: 100% 100%;
+}
+
+.images {
+    display: flex;
+    height: 70vh;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: auto;
 }
