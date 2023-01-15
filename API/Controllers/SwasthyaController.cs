@@ -11,17 +11,15 @@ namespace API.Controllers
     public class SwasthyaController : ControllerBase
     {
         IndividualOperations individualOperations;
-        private IConfiguration configuration;
 
-        public SwasthyaController(IConfiguration configuration, IndividualOperations individualOperations)
+        public SwasthyaController(IndividualOperations individualOperations)
         {
             this.individualOperations = individualOperations;
-            this.configuration = configuration;
         }
 
         [HttpPut]
-        [Route("RegisterIndividual/email/{email}/name/{name}/phoneNumber/{phoneNumber}/dateOfBirth/{dateOfBirth}")]
-        public async Task<ActionResult<IndividualResponseModel>> AddIndividualItem(string email, string name, string phoneNumber, string dateOfBirth)
+        [Route("RegisterIndividual/email/{email}/password/{password}/name/{name}/phoneNumber/{phoneNumber}/dateOfBirth/{dateOfBirth}")]
+        public async Task<ActionResult<IndividualResponseModel>> AddIndividualItem(string email, string password, string name, string phoneNumber, string dateOfBirth)
         {
             dateOfBirth = Uri.UnescapeDataString(dateOfBirth);
 
@@ -33,7 +31,7 @@ namespace API.Controllers
             //    return BadRequest("Invalid Date of Birth");
             //}
 
-            var individual = await individualOperations.AddIndividualDataAsync(email, name, phoneNumber, dateOfBirth);
+            var individual = await individualOperations.AddIndividualDataAsync(email, password, name, phoneNumber, dateOfBirth);
             return Ok(individual.ToAPIModel());
         }
     }

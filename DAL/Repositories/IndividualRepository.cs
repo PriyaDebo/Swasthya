@@ -1,6 +1,7 @@
 ﻿using Common.Models;
 using DAL.Models;
 using Microsoft.Azure.Cosmos;
+using System.Security.Cryptography;
 
 namespace DAL.Repositories
 {
@@ -15,12 +16,25 @@ namespace DAL.Repositories
             container = database.GetContainer("Individual");
         }
 
-        public async Task<IndividualData> CreateIndividualAsync(string email, string name, string phoneNumber, string dateOfBirth)
+        private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
         {
+            using(var hmac = new HMACSHA512())
+            {
+                passwordSalt = hmac.Key;
+                passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
+            }
+        }
+
+        public async Task<IndividualData> CreateIndividualAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        {
+            CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+
             var individual = new IndividualData()
             {
                 Id = Guid.NewGuid(),
                 Email = email,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt,
                 Name = name,
                 PhoneNumber = phoneNumber,
                 DateOfBirth = dateOfBirth

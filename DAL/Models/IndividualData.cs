@@ -13,10 +13,14 @@ namespace DAL.Models
 
         public IndividualData(IndividualData individual)
         {
+            Id= individual.Id;
             Email = individual.Email;
+            PasswordHash= individual.PasswordHash;
+            PasswordSalt= individual.PasswordSalt;
             Name = individual.Name;
             PhoneNumber = individual.PhoneNumber;
             DateOfBirth = individual.DateOfBirth;
+
         }
 
         [JsonProperty(PropertyName = "id")]
@@ -27,6 +31,12 @@ namespace DAL.Models
 
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "passwordHash")]
+        public byte[] PasswordHash { get; set; }
+
+        [JsonProperty(PropertyName = "passwordSalt")]
+        public byte[] PasswordSalt { get; set; }
 
         [JsonProperty(PropertyName = "phone")]
         public string PhoneNumber { get; set; }

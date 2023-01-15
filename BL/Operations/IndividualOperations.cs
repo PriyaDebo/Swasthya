@@ -13,9 +13,9 @@ namespace BL.Operations
             this.individualRepository = individualRepository;
         }
 
-        public async Task<IIndividual> AddIndividualDataAsync(string email, string name, string phoneNumber, string dateOfBirth)
+        public async Task<IIndividual> AddIndividualDataAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
         {
-            var individualResponse = await individualRepository.CreateIndividualAsync(email, name, phoneNumber, dateOfBirth);
+            var individualResponse = await individualRepository.CreateIndividualAsync(email, password, name, phoneNumber, dateOfBirth);
             if (individualResponse != null)
             {
                 return individualResponse;
