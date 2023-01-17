@@ -1,8 +1,8 @@
 using API.Extensions;
 using BL.Operations;
-using Common.ApiModels;
+using Common.ApiRequestModels;
+using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Mvc;
-using System.Globalization;
 
 namespace API.Controllers
 {
@@ -10,29 +10,72 @@ namespace API.Controllers
     [Route("[controller]")]
     public class SwasthyaController : ControllerBase
     {
-        IndividualOperations individualOperations;
+        PatientOperations individualOperations;
 
-        public SwasthyaController(IndividualOperations individualOperations)
+        public SwasthyaController(PatientOperations patientOperations)
         {
-            this.individualOperations = individualOperations;
+            this.individualOperations = patientOperations;
         }
 
         [HttpPut]
-        [Route("RegisterIndividual/email/{email}/password/{password}/name/{name}/phoneNumber/{phoneNumber}/dateOfBirth/{dateOfBirth}")]
-        public async Task<ActionResult<IndividualResponseModel>> AddIndividualItem(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        [Route("RegisterPatient")]
+        public async Task<ActionResult<PatientResponseModel>> AddPatientItemAsync(PatientRequestModel request)
         {
-            dateOfBirth = Uri.UnescapeDataString(dateOfBirth);
-
             //string format = "dd/MM/yyyy";
 
-            //var isDate = DateTime.TryParseExact(dateOfBirth, "M-d-yyyy h:mm tt zzz", CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
+            //var isDate = DateTime.TryParseExact(dateOfBirth, "format", CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
             //if (!isDate)
             //{
             //    return BadRequest("Invalid Date of Birth");
             //}
 
-            var individual = await individualOperations.AddIndividualDataAsync(email, password, name, phoneNumber, dateOfBirth);
-            return Ok(individual.ToAPIModel());
+            if (request.Email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            if (request.Name == null)
+            {
+                return BadRequest("Name should not be empty.");
+            }
+
+            if (request.PhoneNumber == null)
+            {
+                return BadRequest("Phone number should not be empty.");
+            }
+
+            if (request.DateOfBirth == null)
+            {
+                return BadRequest("Date of birth should not be empty.");
+            }
+
+            request.DateOfBirth = Uri.UnescapeDataString(request.DateOfBirth);
+
+            var patient = await individualOperations.AddPatientDataAsync(request.Email, request.Password, request.Name, request.PhoneNumber, request.DateOfBirth);
+
+            if (patient == null)
+            {
+                return Conflict("Email Already Exists");
+            }
+
+            return Ok(patient.ToAPIModel());
+        }
+
+        [HttpGet]
+        [Route("GetPatient/email/{email}")]
+        public async Task<ActionResult<PatientResponseModel>> GetPatientByEmailAsync(string email)
+        {
+            if (email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            return Ok();
         }
     }
 }

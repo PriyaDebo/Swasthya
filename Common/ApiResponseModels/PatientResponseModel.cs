@@ -1,6 +1,6 @@
-﻿namespace Common.ApiModels
+﻿namespace Common.ApiResponseModels
 {
-    public class IndividualResponseModel
+    public class PatientResponseModel
     {
         public string Email { get; set; }
 

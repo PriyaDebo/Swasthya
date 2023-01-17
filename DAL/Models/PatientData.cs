@@ -5,18 +5,17 @@ using Newtonsoft.Json.Serialization;
 namespace DAL.Models
 {
     [JsonObject(NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public class IndividualData : IIndividual
+    public class PatientData : IPatient
     {
-        public IndividualData()
+        public PatientData()
         {
         }
 
-        public IndividualData(IndividualData individual)
+        public PatientData(PatientData individual)
         {
             Id= individual.Id;
             Email = individual.Email;
-            PasswordHash= individual.PasswordHash;
-            PasswordSalt= individual.PasswordSalt;
+            Password = individual.Password;
             Name = individual.Name;
             PhoneNumber = individual.PhoneNumber;
             DateOfBirth = individual.DateOfBirth;
@@ -24,7 +23,7 @@ namespace DAL.Models
         }
 
         [JsonProperty(PropertyName = "id")]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty(PropertyName = "email")]
         public string Email { get; set; }
@@ -32,11 +31,8 @@ namespace DAL.Models
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
-        [JsonProperty(PropertyName = "passwordHash")]
-        public byte[] PasswordHash { get; set; }
-
-        [JsonProperty(PropertyName = "passwordSalt")]
-        public byte[] PasswordSalt { get; set; }
+        [JsonProperty(PropertyName = "password")]
+        public string Password { get; set; }
 
         [JsonProperty(PropertyName = "phone")]
         public string PhoneNumber { get; set; }

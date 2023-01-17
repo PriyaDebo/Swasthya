@@ -1,18 +1,18 @@
-﻿using Common.ApiModels;
+﻿using Common.ApiResponseModels;
 using Common.Models;
 
 namespace API.Extensions
 {
     public static class IndividualExtension
     {
-        public static IndividualResponseModel ToAPIModel(this IIndividual iIndividual)
+        public static PatientResponseModel ToAPIModel(this IPatient patient)
         {
-            var model = new IndividualResponseModel
+            var model = new PatientResponseModel
             {
-                Email = iIndividual.Email,
-                Name = iIndividual.Name,
-                PhoneNumber = iIndividual.PhoneNumber,
-                DateOfBirth = iIndividual.DateOfBirth,
+                Email = patient.Email,
+                Name = patient.Name,
+                PhoneNumber = patient.PhoneNumber,
+                DateOfBirth = patient.DateOfBirth,
             };
 
             return model;

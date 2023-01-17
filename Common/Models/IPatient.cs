@@ -1,12 +1,12 @@
 ﻿namespace Common.Models
 {
-    public interface IIndividual
+    public interface IPatient
     {
+        string Id { get; }
+
         string Email { get; }
 
-        byte[] PasswordHash { get; }
-
-        byte[] PasswordSalt { get; }
+        string Password { get; }
 
         string Name { get; }
 
