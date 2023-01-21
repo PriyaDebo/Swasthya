@@ -1,9 +1,8 @@
-﻿using Azure;
+﻿using BCrypt.Net;
 using Common.DTO;
 using Common.Models;
 using DAL.Models;
 using Microsoft.Azure.Cosmos;
-using System.Security.Cryptography;
 
 namespace DAL.Repositories
 {
@@ -34,19 +33,13 @@ namespace DAL.Repositories
 
         private string CreatePasswordHash(string password)
         {
-            using (var hmac = new HMACSHA512(System.Text.Encoding.UTF8.GetBytes("salt")))
-            {
-                var hashedPasswordByte = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                password = Convert.ToBase64String(hashedPasswordByte);
-            }
-
+            password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);
             return password;
         }
 
         private bool VerifyPasswordHash(string passwordInput, string passwordOriginal)
         {
-            passwordInput = CreatePasswordHash(passwordInput);
-            return String.Equals(passwordInput, passwordOriginal);
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
 
         public async Task<PatientData> CreatePatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)

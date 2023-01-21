@@ -37,7 +37,7 @@ namespace BL.Operations
 
         private string CreatePatientJwtToken(IPatient patient)
         {
-            List<Claim> claims = new List<Claim>
+            List<Claim> claims = new()
             {
                 new Claim(ClaimTypes.NameIdentifier, patient.Name),
                 new Claim(ClaimTypes.Email, patient.Email),

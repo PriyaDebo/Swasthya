@@ -11,13 +11,11 @@ namespace API.Controllers
     [Route("[controller]")]
     public class SwasthyaController : ControllerBase
     {
-        PatientOperations patientOperations;
-        private readonly IConfiguration configuration;
+        readonly PatientOperations patientOperations;
 
-        public SwasthyaController(IConfiguration configuration, PatientOperations patientOperations)
+        public SwasthyaController(PatientOperations patientOperations)
         {
             this.patientOperations = patientOperations;
-            this.configuration = configuration;
         }
 
         [HttpPut]
