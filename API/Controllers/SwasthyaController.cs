@@ -3,6 +3,7 @@ using BL.Operations;
 using Common.ApiRequestModels;
 using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace API.Controllers
 {
@@ -10,25 +11,17 @@ namespace API.Controllers
     [Route("[controller]")]
     public class SwasthyaController : ControllerBase
     {
-        PatientOperations individualOperations;
+        readonly PatientOperations patientOperations;
 
         public SwasthyaController(PatientOperations patientOperations)
         {
-            this.individualOperations = patientOperations;
+            this.patientOperations = patientOperations;
         }
 
         [HttpPut]
-        [Route("RegisterPatient")]
+        [Route("Register/Patient")]
         public async Task<ActionResult<PatientResponseModel>> AddPatientItemAsync(PatientRequestModel request)
         {
-            //string format = "dd/MM/yyyy";
-
-            //var isDate = DateTime.TryParseExact(dateOfBirth, "format", CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
-            //if (!isDate)
-            //{
-            //    return BadRequest("Invalid Date of Birth");
-            //}
-
             if (request.Email == null)
             {
                 return BadRequest("Email should not be empty.");
@@ -55,8 +48,14 @@ namespace API.Controllers
             }
 
             request.DateOfBirth = Uri.UnescapeDataString(request.DateOfBirth);
+            var format = "dd/MM/yyyy";
+            var isDate = DateTime.TryParseExact(request.DateOfBirth, format, CultureInfo.CurrentCulture, DateTimeStyles.None, out var parsedDate);
+            if (!isDate)
+            {
+                return BadRequest("Invalid Date of Birth");
+            }
 
-            var patient = await individualOperations.AddPatientDataAsync(request.Email, request.Password, request.Name, request.PhoneNumber, request.DateOfBirth);
+            var patient = await patientOperations.AddPatientDataAsync(request.Email, request.Password, request.Name, request.PhoneNumber, parsedDate.ToString());
 
             if (patient == null)
             {
@@ -66,16 +65,28 @@ namespace API.Controllers
             return Ok(patient.ToAPIModel());
         }
 
-        [HttpGet]
-        [Route("GetPatient/email/{email}")]
-        public async Task<ActionResult<PatientResponseModel>> GetPatientByEmailAsync(string email)
+        [HttpPost]
+        [Route("Login/Patient")]
+        public async Task<ActionResult<PatientResponseModel>> LoginPatientAsync(PatientRequestModel request)
         {
-            if (email == null)
+            if (request.Email == null)
             {
                 return BadRequest("Email should not be empty.");
             }
 
-            return Ok();
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            var response = await patientOperations.LoginPatientAsync(request.Email, request.Password);
+
+            if (response == null)
+            {
+                return BadRequest("Login Failed");
+            }
+
+            return Ok(response);
         }
     }
 }
