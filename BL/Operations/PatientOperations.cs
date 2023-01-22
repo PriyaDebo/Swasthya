@@ -17,7 +17,7 @@ namespace BL.Operations
             this.patientRepository = patientRepository;
         }
 
-        public async Task<IPatient> AddPatientDataAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        public async Task<IPatient> RegisterPatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
         {
             var emailExists = await patientRepository.EmailExistsAsync(email);
 
@@ -26,7 +26,7 @@ namespace BL.Operations
                 return null;
             }
 
-            var patientResponse = await patientRepository.CreatePatientAsync(email, password, name, phoneNumber, dateOfBirth);
+            var patientResponse = await patientRepository.RegisterPatientAsync(email, password, name, phoneNumber, dateOfBirth);
             if (patientResponse != null)
             {
                 return patientResponse;

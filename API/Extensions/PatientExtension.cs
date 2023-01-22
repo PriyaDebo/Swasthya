@@ -3,7 +3,7 @@ using Common.Models;
 
 namespace API.Extensions
 {
-    public static class IndividualExtension
+    public static class PatientExtension
     {
         public static PatientResponseModel ToAPIModel(this IPatient patient)
         {
