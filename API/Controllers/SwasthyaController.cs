@@ -12,6 +12,7 @@ namespace API.Controllers
     public class SwasthyaController : ControllerBase
     {
         readonly PatientOperations patientOperations;
+        readonly DoctorOperations doctorOperations;
 
         public SwasthyaController(PatientOperations patientOperations)
         {
@@ -20,7 +21,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("Register/Patient")]
-        public async Task<ActionResult<PatientResponseModel>> AddPatientItemAsync(PatientRequestModel request)
+        public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(PatientRequestModel request)
         {
             if (request.Email == null)
             {
@@ -55,7 +56,7 @@ namespace API.Controllers
                 return BadRequest("Invalid Date of Birth");
             }
 
-            var patient = await patientOperations.AddPatientDataAsync(request.Email, request.Password, request.Name, request.PhoneNumber, parsedDate.ToString());
+            var patient = await patientOperations.RegisterPatientAsync(request.Email, request.Password, request.Name, request.PhoneNumber, parsedDate.ToString());
 
             if (patient == null)
             {
@@ -84,6 +85,69 @@ namespace API.Controllers
             if (response == null)
             {
                 return BadRequest("Login Failed");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPut]
+        [Route("Register/Doctor")]
+        public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(DoctorRequestModel request)
+        {
+            if (request.Email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            if (request.Name == null)
+            {
+                return BadRequest("Name should not be empty.");
+            }
+
+            if (request.PhoneNumber == null)
+            {
+                return BadRequest("Phone number should not be empty.");
+            }
+
+            if (request.RegistrationNumber == null)
+            {
+                return BadRequest("Registration number should not be empty.");
+            }
+
+            var doctor = await doctorOperations.RegisterDoctorAsync(request.Email, request.Password, request.Name, request.PhoneNumber, request.RegistrationNumber);
+
+            if (doctor == null)
+            {
+                return Conflict("Doctor Already Registered.");
+            }
+
+            return Ok(doctor.ToAPIModel());
+        }
+
+        [HttpPost]
+        [Route("Login/Doctor")]
+        public async Task<ActionResult<DoctorResponseModel>> LoginDoctorAsync(DoctorRequestModel request)
+        {
+            if (request.Email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            var response = await doctorOperations.LoginDoctorAsync(request.Email, request.Password);
+
+            if (response == null)
+            {
+                return BadRequest("Login Failed.");
             }
 
             return Ok(response);

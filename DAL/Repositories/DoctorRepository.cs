@@ -6,23 +6,33 @@ using Microsoft.Azure.Cosmos;
 
 namespace DAL.Repositories
 {
-    public class PatientRepository
+    public class DoctorRepository
     {
         private Database database;
         private Container container;
 
-        public PatientRepository(CosmosClient client)
+        public DoctorRepository(CosmosClient client)
         {
             this.database = client.GetDatabase("Swasthya");
-            this.container = database.GetContainer("Patient");
+            this.container = database.GetContainer("Doctor");
         }
 
         public async Task<Boolean> EmailExistsAsync(string email)
         {
-            var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
+            var query = $"SELECT * FROM Doctor WHERE Doctor.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var emailResponse = this.container.GetItemQueryIterator<PatientData>(queryDefinition);
+            var emailResponse = this.container.GetItemQueryIterator<DoctorData>(queryDefinition);
             var response = await emailResponse.ReadNextAsync();
+
+            return response.Resource.FirstOrDefault() != null;
+        }
+
+        public async Task<Boolean> RegistrationNumberExistsAsync(string registrationNumber)
+        {
+            var query = $"SELECT * FROM Doctor WHERE Doctor.registrationNumber = @registrationNumber";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@registrationNumber", registrationNumber);
+            var registrationNumberResponse = this.container.GetItemQueryIterator<DoctorData>(queryDefinition);
+            var response = await registrationNumberResponse.ReadNextAsync();
 
             return response.Resource.FirstOrDefault() != null;
         }
@@ -38,28 +48,28 @@ namespace DAL.Repositories
             return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
 
-        public async Task<PatientData> RegisterPatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        public async Task<DoctorData> RegisterDoctorAsync(string email, string password, string name, string registrationNumber, string phoneNumber)
         {
-            var patient = new PatientData()
+            var doctor = new DoctorData()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
                 Password = CreatePasswordHash(password),
                 Name = name,
-                PhoneNumber = phoneNumber,
-                DateOfBirth = dateOfBirth
+                RegistrationNumber = registrationNumber,
+                PhoneNumber = phoneNumber
             };
 
-            var patientCreated = await container.CreateItemAsync<PatientData>(patient);
-            return patientCreated.Resource;
+            var doctorData = await container.CreateItemAsync<DoctorData>(doctor);
+            return doctorData;
         }
 
-        public async Task<IPatient> LoginPatientAsync(string email, string password)
+        public async Task<IDoctor> LoginDoctorAsync(string email, string password)
         {
-            var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
+            var query = $"SELECT * FROM Doctor WHERE Doctor.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var patientResponse = this.container.GetItemQueryIterator<PatientData>(queryDefinition);
-            var response = await patientResponse.ReadNextAsync();
+            var doctorResponse = this.container.GetItemQueryIterator<DoctorData>(queryDefinition);
+            var response = await doctorResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();
 
             if (responseResource == null)
@@ -72,15 +82,15 @@ namespace DAL.Repositories
                 return null;
             }
 
-            var patient = new Patient()
+            var doctor = new Doctor()
             {
                 Name = responseResource.Name,
                 Email = responseResource.Email,
                 PhoneNumber = responseResource.PhoneNumber,
-                DateOfBirth = responseResource.DateOfBirth,
+                RegistrationNumber = responseResource.RegistrationNumber,
             };
 
-            return patient;
+            return doctor;
         }
     }
 }

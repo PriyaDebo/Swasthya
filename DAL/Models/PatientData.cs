@@ -11,14 +11,14 @@ namespace DAL.Models
         {
         }
 
-        public PatientData(PatientData individual)
+        public PatientData(PatientData patient)
         {
-            Id= individual.Id;
-            Email = individual.Email;
-            Password = individual.Password;
-            Name = individual.Name;
-            PhoneNumber = individual.PhoneNumber;
-            DateOfBirth = individual.DateOfBirth;
+            Id = patient.Id;
+            Email = patient.Email;
+            Password = patient.Password;
+            Name = patient.Name;
+            PhoneNumber = patient.PhoneNumber;
+            DateOfBirth = patient.DateOfBirth;
 
         }
 
