@@ -1,6 +1,7 @@
 using API.Extensions;
 using BL.Operations;
-using Common.ApiRequestModels;
+using Common.ApiRequestModels.DoctorRequestModels;
+using Common.ApiRequestModels.PatientRequestModels;
 using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
@@ -21,7 +22,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("Register/Patient")]
-        public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(PatientRequestModel request)
+        public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(RegisterPatientRequest request)
         {
             if (request.Email == null)
             {
@@ -68,7 +69,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login/Patient")]
-        public async Task<ActionResult<PatientResponseModel>> LoginPatientAsync(PatientRequestModel request)
+        public async Task<ActionResult<PatientResponseModel>> LoginPatientAsync(LoginPatientRequest request)
         {
             if (request.Email == null)
             {
@@ -92,7 +93,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("Register/Doctor")]
-        public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(DoctorRequestModel request)
+        public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(RegisterDoctorRequest request)
         {
             if (request.Email == null)
             {
@@ -131,7 +132,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login/Doctor")]
-        public async Task<ActionResult<DoctorResponseModel>> LoginDoctorAsync(DoctorRequestModel request)
+        public async Task<ActionResult<DoctorResponseModel>> LoginDoctorAsync(LoginDoctorRequest request)
         {
             if (request.Email == null)
             {

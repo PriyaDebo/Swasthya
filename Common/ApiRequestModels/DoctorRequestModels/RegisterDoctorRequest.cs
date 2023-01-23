@@ -1,6 +1,6 @@
-﻿namespace Common.ApiRequestModels
+﻿namespace Common.ApiRequestModels.DoctorRequestModels
 {
-    public class DoctorRequestModel
+    public class RegisterDoctorRequest
     {
         public string Email { get; set; }
 
