@@ -27,12 +27,7 @@ namespace BL.Operations
             }
 
             var patientResponse = await patientRepository.RegisterPatientAsync(email, password, name, phoneNumber, dateOfBirth);
-            if (patientResponse != null)
-            {
-                return patientResponse;
-            }
-
-            return null;
+            return patientResponse;
         }
 
         private string CreatePatientJwtToken(IPatient patient)
