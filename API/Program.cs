@@ -9,6 +9,10 @@ var token = builder.Configuration["Token"];
 
 builder.Services.AddScoped<PatientOperations>();
 builder.Services.AddScoped<PatientRepository>();
+builder.Services.AddScoped<DoctorOperations>();
+builder.Services.AddScoped<DoctorRepository>();
+builder.Services.AddScoped<HospitalOperations>();
+builder.Services.AddScoped<HospitalRepository>();
 builder.Services.AddScoped(sp => new CosmosClient(endpoint, primaryKey));
 builder.Services.AddScoped(sp => token);
 builder.Services.AddControllers();
