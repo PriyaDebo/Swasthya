@@ -15,9 +15,10 @@ namespace API.Controllers
         readonly PatientOperations patientOperations;
         readonly DoctorOperations doctorOperations;
 
-        public SwasthyaController(PatientOperations patientOperations)
+        public SwasthyaController(PatientOperations patientOperations, DoctorOperations doctorOperations)
         {
             this.patientOperations = patientOperations;
+            this.doctorOperations = doctorOperations;
         }
 
         [HttpPut]
