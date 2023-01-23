@@ -1,27 +1,26 @@
 ﻿using BCrypt.Net;
-using Common.DTO;
 using Common.Models;
 using DAL.Models;
 using Microsoft.Azure.Cosmos;
 
 namespace DAL.Repositories
 {
-    public class PatientRepository
+    public class HospitalRepository
     {
         private Database database;
         private Container container;
 
-        public PatientRepository(CosmosClient client)
+        public HospitalRepository(CosmosClient client)
         {
             this.database = client.GetDatabase("Swasthya");
-            this.container = database.GetContainer("Patient");
+            this.container = database.GetContainer("Hospital");
         }
 
         public async Task<Boolean> EmailExistsAsync(string email)
         {
-            var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
+            var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var emailResponse = this.container.GetItemQueryIterator<PatientData>(queryDefinition);
+            var emailResponse = this.container.GetItemQueryIterator<HospitalData>(queryDefinition);
             var response = await emailResponse.ReadNextAsync();
 
             return response.Resource.FirstOrDefault() != null;
@@ -38,28 +37,28 @@ namespace DAL.Repositories
             return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
 
-        public async Task<PatientData> RegisterPatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        public async Task<HospitalData> RegisterHospitalAsync(string email, string password, string name, string address, string phoneNumber)
         {
-            var patient = new PatientData()
+            var hospital = new HospitalData()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
                 Password = CreatePasswordHash(password),
                 Name = name,
-                PhoneNumber = phoneNumber,
-                DateOfBirth = dateOfBirth
+                Address = address,
+                PhoneNumber = phoneNumber
             };
 
-            var patientRegistered = await container.CreateItemAsync<PatientData>(patient);
-            return patientRegistered.Resource;
+            var doctorRegistered = await container.CreateItemAsync<HospitalData>(hospital);
+            return doctorRegistered.Resource;
         }
 
-        public async Task<IPatient> LoginPatientAsync(string email, string password)
+        public async Task<IHospital> LoginHospitalAsync(string email, string password)
         {
-            var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
+            var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var patientResponse = this.container.GetItemQueryIterator<PatientData>(queryDefinition);
-            var response = await patientResponse.ReadNextAsync();
+            var hospitalResponse = this.container.GetItemQueryIterator<HospitalData>(queryDefinition);
+            var response = await hospitalResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();
 
             if (responseResource == null)
@@ -72,15 +71,15 @@ namespace DAL.Repositories
                 return null;
             }
 
-            var patient = new Patient()
+            var hospital = new HospitalData()
             {
-                Name = responseResource.Name,
                 Email = responseResource.Email,
+                Name = responseResource.Name,
+                Address = responseResource.Address,
                 PhoneNumber = responseResource.PhoneNumber,
-                DateOfBirth = responseResource.DateOfBirth,
             };
 
-            return patient;
+            return hospital;
         }
     }
 }
