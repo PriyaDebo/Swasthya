@@ -32,12 +32,7 @@ namespace BL.Operations
             }
 
             var doctorResponse = await doctorRepository.RegisterDoctorAsync(email, password, name, registrationNumber, phoneNumber);
-            if (doctorResponse != null)
-            {
-                return doctorResponse;
-            }
-
-            return null;
+            return doctorResponse;
         }
 
         private string CreateDoctorJwtToken(IDoctor doctor)

@@ -1,9 +1,12 @@
 using API.Extensions;
 using BL.Operations;
-using Common.ApiRequestModels;
+using Common.ApiRequestModels.DoctorRequestModels;
+using Common.ApiRequestModels.HospitalRequestModels;
+using Common.ApiRequestModels.PatientRequestModels;
 using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace API.Controllers
 {
@@ -13,15 +16,18 @@ namespace API.Controllers
     {
         readonly PatientOperations patientOperations;
         readonly DoctorOperations doctorOperations;
+        readonly HospitalOperations hospitalOperations;
 
-        public SwasthyaController(PatientOperations patientOperations)
+        public SwasthyaController(PatientOperations patientOperations, DoctorOperations doctorOperations, HospitalOperations hospitalOperations)
         {
             this.patientOperations = patientOperations;
+            this.doctorOperations = doctorOperations;
+            this.hospitalOperations = hospitalOperations;
         }
 
         [HttpPut]
         [Route("Register/Patient")]
-        public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(PatientRequestModel request)
+        public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(RegisterPatientRequest request)
         {
             if (request.Email == null)
             {
@@ -68,7 +74,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login/Patient")]
-        public async Task<ActionResult<PatientResponseModel>> LoginPatientAsync(PatientRequestModel request)
+        public async Task<ActionResult<string>> LoginPatientAsync(LoginPatientRequest request)
         {
             if (request.Email == null)
             {
@@ -92,7 +98,7 @@ namespace API.Controllers
 
         [HttpPut]
         [Route("Register/Doctor")]
-        public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(DoctorRequestModel request)
+        public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(RegisterDoctorRequest request)
         {
             if (request.Email == null)
             {
@@ -131,7 +137,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("Login/Doctor")]
-        public async Task<ActionResult<DoctorResponseModel>> LoginDoctorAsync(DoctorRequestModel request)
+        public async Task<ActionResult<string>> LoginDoctorAsync(LoginDoctorRequest request)
         {
             if (request.Email == null)
             {
@@ -148,6 +154,69 @@ namespace API.Controllers
             if (response == null)
             {
                 return BadRequest("Login Failed.");
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPut]
+        [Route("Register/Hospital")]
+        public async Task<ActionResult<HospitalResponseModel>> RegisterHospitalAsync(RegisterHospitalRequest request)
+        {
+            if (request.Email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            if (request.Name == null)
+            {
+                return BadRequest("Name should not be empty.");
+            }
+
+            if (request.PhoneNumber == null)
+            {
+                return BadRequest("Phone number should not be empty.");
+            }
+
+            if (request.Address == null)
+            {
+                return BadRequest("Address should not be empty.");
+            }
+
+            var hospital = await hospitalOperations.RegisterHospital(request.Email, request.Password, request.Name, request.Address, request.PhoneNumber);
+
+            if (hospital == null)
+            {
+                return BadRequest("Email already registered.");
+            }
+
+            return Ok(hospital.ToAPIModel());
+        }
+
+        [HttpPost]
+        [Route("Login/Hospital")]
+        public async Task<ActionResult<string>> LoginHospitalAsync(LoginHospitalRequest request)
+        {
+            if (request.Email == null)
+            {
+                return BadRequest("Email should not be empty.");
+            }
+
+            if (request.Password == null)
+            {
+                return BadRequest("Password should not be empty.");
+            }
+
+            var response = await hospitalOperations.LoginHospitalAsync(request.Email, request.Password);
+
+            if (response == null)
+            {
+                return BadRequest("Login Failed");
             }
 
             return Ok(response);
