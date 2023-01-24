@@ -6,6 +6,8 @@
 
         string Email { get; }
 
+        string Title { get; }
+
         string MedicalReport { get; }
     }
 }

@@ -8,6 +8,8 @@ namespace Common.DTO
 
         public string Email { get; set; }
 
+        public string Title { get; set; }
+
         public string MedicalReport { get; set; }
     }
 }
