@@ -1,19 +1,15 @@
-﻿using Common.Models;
+﻿using BCrypt.Net;
+using Common.Models;
 using DAL.Repositories;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace BL.Operations
 {
     public class HospitalOperations
     {
-        private string token;
         HospitalRepository hospitalRepository;
 
-        public HospitalOperations(string token, HospitalRepository hospitalRepository)
+        public HospitalOperations(HospitalRepository hospitalRepository)
         {
-            this.token = token;
             this.hospitalRepository = hospitalRepository;
         }
 
@@ -26,44 +22,44 @@ namespace BL.Operations
                 return null;
             }
 
-            var hospitalResponse = await hospitalRepository.RegisterHospitalAsync(email, password, name, address, phoneNumber);
+            password = CreatePasswordHash(password);
+
+            var hospitalResponse = await hospitalRepository.CreateHospitalAsync(email, password, name, address, phoneNumber);
             return hospitalResponse;
         }
 
-        private string CreateHospitalJwtToken(IHospital hospital)
+        public async Task<IHospital> LoginHospitalAsync(string email, string password)
         {
-            List<Claim> claims = new()
+            var hospital = await hospitalRepository.GetHospitalAsync(email);
+
+            if (hospital == null)
             {
-                new Claim(ClaimTypes.NameIdentifier, hospital.Name),
-                new Claim(ClaimTypes.Email, hospital.Email),
-                new Claim(ClaimTypes.StreetAddress, hospital.Address),
-                new Claim(ClaimTypes.MobilePhone, hospital.PhoneNumber)
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(token));
-
-            var loginCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(5),
-                signingCredentials: loginCredentials);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-            return jwt;
-        }
-
-        public async Task<string> LoginHospitalAsync(string email, string password)
-        {
-            var hospitalResponse = await hospitalRepository.LoginHospitalAsync(email, password);
-
-            if (hospitalResponse != null)
-            {
-                return CreateHospitalJwtToken(hospitalResponse);
+                return null;
             }
 
-            return null;
+
+            if (!VerifyPasswordHash(password, hospital.Password))
+            {
+                return null;
+            }
+
+            return hospital;
+        }
+
+        public async Task<IHospital> GetHospitalAsync(string email)
+        {
+            return await hospitalRepository.GetHospitalAsync(email);
+        }
+
+        private string CreatePasswordHash(string password)
+        {
+            password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);
+            return password;
+        }
+
+        private bool VerifyPasswordHash(string passwordInput, string passwordOriginal)
+        {
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
     }
 }

@@ -38,6 +38,6 @@ namespace DAL.Models
         public string PhoneNumber { get; set; }
 
         [JsonProperty(PropertyName = "dateOfBirth")]
-        public string DateOfBirth{ get; set; }
+        public string DateOfBirth { get; set; }
     }
 }

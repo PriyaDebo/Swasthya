@@ -1,8 +1,6 @@
-﻿using Common.Models;
+﻿using BCrypt.Net;
+using Common.Models;
 using DAL.Repositories;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace BL.Operations
 {
@@ -17,7 +15,7 @@ namespace BL.Operations
             this.patientRepository = patientRepository;
         }
 
-        public async Task<IPatient> RegisterPatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
+        public async Task<IPatient> CreatePatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
         {
             var emailExists = await patientRepository.EmailExistsAsync(email);
 
@@ -26,44 +24,44 @@ namespace BL.Operations
                 return null;
             }
 
-            var patientResponse = await patientRepository.RegisterPatientAsync(email, password, name, phoneNumber, dateOfBirth);
+            password = CreatePasswordHash(password);
+
+            var patientResponse = await patientRepository.CreatePatientAsync(email, password, name, phoneNumber, dateOfBirth);
             return patientResponse;
         }
 
-        private string CreatePatientJwtToken(IPatient patient)
+        public async Task<IPatient> LoginPatientAsync(string email, string password)
         {
-            List<Claim> claims = new()
+            var patient = await patientRepository.GetPatientAsync(email);
+
+            if (patient == null)
             {
-                new Claim(ClaimTypes.NameIdentifier, patient.Name),
-                new Claim(ClaimTypes.Email, patient.Email),
-                new Claim(ClaimTypes.DateOfBirth, patient.DateOfBirth),
-                new Claim(ClaimTypes.MobilePhone, patient.PhoneNumber)
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(token));
-
-            var loginCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(5),
-                signingCredentials: loginCredentials);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-            return jwt;
-        }
-
-        public async Task<string> LoginPatientAsync(string email, string password)
-        {
-            var patientResponse = await patientRepository.LoginPatientAsync(email, password);
-
-            if (patientResponse != null)
-            {
-                return CreatePatientJwtToken(patientResponse);
+                return null;
             }
 
-            return null;
+            if (!VerifyPasswordHash(password, patient.Password))
+            {
+                return null;
+            }
+
+            return patient;
+
+        }
+
+        public async Task<IPatient> GetPatientAsync(string email)
+        {
+            return await patientRepository.GetPatientAsync(email);
+        }
+
+        private string CreatePasswordHash(string password)
+        {
+            password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);
+            return password;
+        }
+
+        private bool VerifyPasswordHash(string passwordInput, string passwordOriginal)
+        {
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
     }
 }

@@ -1,9 +1,6 @@
 ﻿namespace Common.ApiRequestModels.DoctorRequestModels
 {
-    public class LoginDoctorRequest
+    public class LoginDoctorRequest : LoginRequest
     {
-        public string Email { get; set; }
-
-        public string Password { get; set; }
     }
 }

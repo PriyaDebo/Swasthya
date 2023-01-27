@@ -7,13 +7,13 @@ namespace DAL.Repositories
 {
     public class ReportRepository
     {
-        private Database database;
-        private Container container;
+        private readonly Database database;
+        private readonly Container container;
 
         public ReportRepository(CosmosClient client)
         {
-            this.database = client.GetDatabase("Swasthya");
-            this.container = database.GetContainer("Reports");
+            database = client.GetDatabase("Swasthya");
+            container = database.GetContainer("Reports");
         }
 
         public async Task<ReportData> AddReportAsync(string email, string title, string report)
@@ -35,8 +35,8 @@ namespace DAL.Repositories
             var reports = new List<IReport>();
             var query = $"SELECT * from Reports WHERE Reports.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var iterator = this.container.GetItemQueryIterator<ReportData>(queryDefinition);
-            while(iterator.HasMoreResults)
+            var iterator = container.GetItemQueryIterator<ReportData>(queryDefinition);
+            while (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync();
                 foreach (var report in response)
@@ -61,7 +61,7 @@ namespace DAL.Repositories
         {
             var query = $"SELECT * from Reports WHERE Report.id = @id";
             var queryDefinition = new QueryDefinition(query).WithParameter("@id", id);
-            var reportResponse = this.container.GetItemQueryIterator<ReportData>(queryDefinition);
+            var reportResponse = container.GetItemQueryIterator<ReportData>(queryDefinition);
             var response = await reportResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();
 

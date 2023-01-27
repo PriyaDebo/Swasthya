@@ -34,7 +34,7 @@ namespace DAL.Models
         public string Name { get; set; }
 
         [JsonProperty(PropertyName = "registrationNumber")]
-        public string RegistrationNumber{ get; set; }
+        public string RegistrationNumber { get; set; }
 
         [JsonProperty(PropertyName = "phone")]
         public string PhoneNumber { get; set; }
