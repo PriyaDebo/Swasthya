@@ -46,9 +46,7 @@ namespace DAL.Repositories
                         reports.Add(new Report()
                         {
                             Id = report.Id,
-                            Email = report.Email,
                             Title = report.Title,
-                            MedicalReport = report.MedicalReport
                         });
                     }
                 }

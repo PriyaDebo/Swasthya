@@ -36,13 +36,14 @@ namespace DAL.Repositories
             return response.Resource.FirstOrDefault() != null;
         }
 
-        public async Task<DoctorData> CreateDoctorAsync(string email, string password, string name, string registrationNumber, string phoneNumber)
+        public async Task<DoctorData> CreateDoctorAsync(string email, string password, string name, string swasthyaId, string registrationNumber, string phoneNumber)
         {
             var doctor = new DoctorData()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
                 Password = password,
+                SwasthyaId = swasthyaId,
                 Name = name,
                 RegistrationNumber = registrationNumber,
                 PhoneNumber = phoneNumber
@@ -70,6 +71,7 @@ namespace DAL.Repositories
                 Name = responseResource.Name,
                 Email = responseResource.Email,
                 Password = responseResource.Password,
+                SwasthyaId = responseResource.SwasthyaId,
                 PhoneNumber = responseResource.PhoneNumber,
                 RegistrationNumber = responseResource.RegistrationNumber,
             };

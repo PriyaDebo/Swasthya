@@ -8,6 +8,8 @@
 
         public string PhoneNumber { get; set; }
 
+        public string SwasthyaId { get; set; }
+
         public string RegistrationNumber { get; set; }
     }
 }

@@ -11,6 +11,7 @@ namespace API.Extensions
             {
                 Email = doctor.Email,
                 Name = doctor.Name,
+                SwasthyaId = doctor.SwasthyaId,
                 PhoneNumber = doctor.PhoneNumber,
                 RegistrationNumber = doctor.RegistrationNumber,
             };

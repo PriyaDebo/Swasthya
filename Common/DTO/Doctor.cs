@@ -12,6 +12,8 @@ namespace Common.DTO
 
         public string Name { get; set; }
 
+        public string SwasthyaId { get; set; }
+
         public string RegistrationNumber { get; set; }
 
         public string PhoneNumber { get; set; }
