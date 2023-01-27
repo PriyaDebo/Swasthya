@@ -24,7 +24,10 @@ namespace BL.Operations
 
             password = CreatePasswordHash(password);
 
-            var patientResponse = await patientRepository.CreatePatientAsync(email, password, name, phoneNumber, dateOfBirth);
+            Random random = new Random();
+            var swasthyaId = name + "_" + random.Next();
+
+            var patientResponse = await patientRepository.CreatePatientAsync(email, password, name, swasthyaId, phoneNumber, dateOfBirth);
             return patientResponse;
         }
 

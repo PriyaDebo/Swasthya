@@ -31,6 +31,9 @@ namespace DAL.Models
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "swasthyaId")]
+        public string SwasthyaId { get; set; }
+
         [JsonProperty(PropertyName = "password")]
         public string Password { get; set; }
 
