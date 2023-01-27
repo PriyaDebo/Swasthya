@@ -2,7 +2,6 @@
 using BL.Operations;
 using Common.ApiRequestModels.HospitalRequestModels;
 using Common.ApiResponseModels;
-using Common.DTO;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,29 +26,9 @@ namespace API.Controllers
         [Route("register")]
         public async Task<ActionResult<HospitalResponseModel>> RegisterHospitalAsync(RegisterHospitalRequest request)
         {
-            if (request.Email == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
-            }
-
-            if (request.Name == null)
-            {
-                return BadRequest("Name should not be empty.");
-            }
-
-            if (request.PhoneNumber == null)
-            {
-                return BadRequest("Phone number should not be empty.");
-            }
-
-            if (request.Address == null)
-            {
-                return BadRequest("Address should not be empty.");
+                return BadRequest();
             }
 
             var hospital = await hospitalOperations.RegisterHospital(request.Email, request.Password, request.Name, request.Address, request.PhoneNumber);
@@ -69,17 +48,7 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
-            }
-
-            if (request.Email == null)
-            {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
+                return BadRequest();
             }
 
             var hospital = await hospitalOperations.LoginHospitalAsync(request.Email, request.Password);
@@ -107,5 +76,14 @@ namespace API.Controllers
 
             return Ok();
         }
+
+        [HttpGet]
+        [Route("getHospital")]
+        public async Task<ActionResult<HospitalResponseModel>> GetHospitalAsync()
+        {
+            var hospital = await hospitalOperations.GetHospitalAsync(User.FindFirstValue(ClaimTypes.Email));
+            return Ok(hospital.ToAPIModel());
+        }
+
     }
 }

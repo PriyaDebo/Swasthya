@@ -1,8 +1,8 @@
-using DAL.Repositories;
-using BL.Operations;
-using Microsoft.Azure.Cosmos;
-using Common.ApiResponseModels;
 using API;
+using BL.Operations;
+using Common.ApiResponseModels;
+using DAL.Repositories;
+using Microsoft.Azure.Cosmos;
 
 var builder = WebApplication.CreateBuilder(args);
 var primaryKey = builder.Configuration["CosmosDbPrimaryKey"];

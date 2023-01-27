@@ -27,29 +27,9 @@ namespace API.Controllers
         [Route("register")]
         public async Task<ActionResult<DoctorResponseModel>> RegisterDoctorAsync(RegisterDoctorRequest request)
         {
-            if (request.Email == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
-            }
-
-            if (request.Name == null)
-            {
-                return BadRequest("Name should not be empty.");
-            }
-
-            if (request.PhoneNumber == null)
-            {
-                return BadRequest("Phone number should not be empty.");
-            }
-
-            if (request.RegistrationNumber == null)
-            {
-                return BadRequest("Registration number should not be empty.");
+                return BadRequest();
             }
 
             var doctor = await doctorOperations.RegisterDoctorAsync(request.Email, request.Password, request.Name, request.PhoneNumber, request.RegistrationNumber);
@@ -67,14 +47,9 @@ namespace API.Controllers
         [Route("login")]
         public async Task<ActionResult> LoginDoctorAsync(LoginDoctorRequest request)
         {
-            if (request.Email == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
+                return BadRequest();
             }
 
             var doctor = await doctorOperations.LoginDoctorAsync(request.Email, request.Password);
@@ -101,6 +76,14 @@ namespace API.Controllers
                 });
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Route("getDoctor")]
+        public async Task<ActionResult<PatientResponseModel>> GetPatientAsync()
+        {
+            var doctor = await doctorOperations.GetDoctorAsync(User.FindFirstValue(ClaimTypes.Email));
+            return Ok(doctor.ToAPIModel());
         }
     }
 }

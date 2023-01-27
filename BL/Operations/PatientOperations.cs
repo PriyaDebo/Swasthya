@@ -6,12 +6,10 @@ namespace BL.Operations
 {
     public class PatientOperations
     {
-        private string token;
         PatientRepository patientRepository;
 
-        public PatientOperations(string token, PatientRepository patientRepository)
+        public PatientOperations(PatientRepository patientRepository)
         {
-            this.token = token;
             this.patientRepository = patientRepository;
         }
 

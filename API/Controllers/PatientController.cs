@@ -5,7 +5,6 @@ using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Globalization;
 using System.Security.Claims;
 
@@ -28,29 +27,9 @@ namespace API.Controllers
         [Route("register")]
         public async Task<ActionResult<PatientResponseModel>> RegisterPatientAsync(RegisterPatientRequest request)
         {
-            if (request.Email == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
-            }
-
-            if (request.Name == null)
-            {
-                return BadRequest("Name should not be empty.");
-            }
-
-            if (request.PhoneNumber == null)
-            {
-                return BadRequest("Phone number should not be empty.");
-            }
-
-            if (request.DateOfBirth == null)
-            {
-                return BadRequest("Date of birth should not be empty.");
+                return BadRequest();
             }
 
             request.DateOfBirth = Uri.UnescapeDataString(request.DateOfBirth);
@@ -78,17 +57,7 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
-            }
-
-            if (request.Email == null)
-            {
-                return BadRequest("Email should not be empty.");
-            }
-
-            if (request.Password == null)
-            {
-                return BadRequest("Password should not be empty.");
+                return BadRequest();
             }
 
             var patient = await patientOperations.LoginPatientAsync(request.Email, request.Password);
@@ -121,7 +90,6 @@ namespace API.Controllers
         [Route("getPatient")]
         public async Task<ActionResult<PatientResponseModel>> GetPatientAsync()
         {
-            Debug.WriteLine(User);
             var patient = await patientOperations.GetPatientAsync(User.FindFirstValue(ClaimTypes.Email));
             return Ok(patient.ToAPIModel());
         }
