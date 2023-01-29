@@ -1,4 +1,5 @@
-﻿using Common.DTO;
+﻿using Azure.Storage.Blobs;
+using Common.DTO;
 using Common.Models;
 using DAL.Models;
 using Microsoft.Azure.Cosmos;

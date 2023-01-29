@@ -1,4 +1,5 @@
-﻿using Common.DTO;
+﻿using Azure.Storage.Blobs;
+using Common.DTO;
 using Common.Models;
 using DAL.Models;
 using Microsoft.Azure.Cosmos;
@@ -9,11 +10,13 @@ namespace DAL.Repositories
     {
         private readonly Database database;
         private readonly Container container;
+        private readonly BlobContainerClient blobServiceClient;
 
-        public ReportRepository(CosmosClient client)
+        public ReportRepository(CosmosClient client, BlobServiceClient blobServiceClient)
         {
-            database = client.GetDatabase("Swasthya");
-            container = database.GetContainer("Reports");
+            this.database = client.GetDatabase("Swasthya");
+            this.container = database.GetContainer("Reports");
+            this.blobServiceClient = blobServiceClient.GetBlobContainerClient("reports");
         }
 
         public async Task<ReportData> AddReportAsync(string email, string title, string report)
@@ -54,6 +57,15 @@ namespace DAL.Repositories
 
             return reports;
         }
+
+        //public async Task<object> ReportExists(string reference)
+        //{
+        //    Stream rep;
+        //    var blob = blobServiceClient.GetBlobClient("guid");
+        //    var report = await blob.UploadAsync(rep);
+        //    var blobUri = blob.Uri.AbsoluteUri;
+        //    await blob.DownloadToAsync(rep);
+        //}
 
         public async Task<IReport> GetReportByIdAsync(string id)
         {

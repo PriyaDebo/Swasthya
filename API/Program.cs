@@ -3,6 +3,8 @@ using BL.Operations;
 using Common.ApiResponseModels;
 using DAL.Repositories;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Azure;
+using Azure.Storage.Blobs;
 
 var builder = WebApplication.CreateBuilder(args);
 var primaryKey = builder.Configuration["CosmosDbPrimaryKey"];
@@ -76,6 +78,11 @@ builder.Services.AddScoped(sp => new CosmosClient(endpoint, primaryKey));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAzureClients(clientBuilder =>
+{
+    clientBuilder.AddBlobServiceClient(builder.Configuration["StorageConnectionString:blob"], preferMsi: true);
+    clientBuilder.AddQueueServiceClient(builder.Configuration["StorageConnectionString:queue"], preferMsi: true);
+});
 
 var app = builder.Build();
 
