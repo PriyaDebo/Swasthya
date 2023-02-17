@@ -60,6 +60,7 @@ namespace DAL.Repositories
 
             var patient = new Patient()
             {
+                Id = responseResource.Id,
                 Name = responseResource.Name,
                 Email = responseResource.Email,
                 Password = responseResource.Password,
@@ -70,6 +71,28 @@ namespace DAL.Repositories
             };
 
             return patient;
+        }
+
+        public async Task<bool> AddPermittedDoctorIdAsync(string email, string doctorId)
+        {
+            var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
+            var patientResponse = container.GetItemQueryIterator<PatientData>(queryDefinition);
+            var response = await patientResponse.ReadNextAsync();
+            var responseResource = response.Resource.FirstOrDefault();
+
+            if (responseResource == null)
+            {
+                return false;
+            }
+
+            var newPatient = new PatientData(responseResource);
+
+            newPatient.DoctorIds ??= new List<string>();
+
+            newPatient.DoctorIds.Add(doctorId);
+            await container.ReplaceItemAsync<PatientData>(newPatient, newPatient.Id);
+            return true;
         }
     }
 }

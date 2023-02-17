@@ -57,6 +57,7 @@ namespace DAL.Repositories
 
             var hospital = new HospitalData()
             {
+                Id = responseResource.Id,
                 Email = responseResource.Email,
                 Name = responseResource.Name,
                 Password = responseResource.Password,

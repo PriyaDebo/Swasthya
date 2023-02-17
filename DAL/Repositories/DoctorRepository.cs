@@ -69,6 +69,7 @@ namespace DAL.Repositories
 
             var doctor = new Doctor()
             {
+                Id = responseResource.Id,
                 Name = responseResource.Name,
                 Email = responseResource.Email,
                 Password = responseResource.Password,

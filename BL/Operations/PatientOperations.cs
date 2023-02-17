@@ -54,6 +54,11 @@ namespace BL.Operations
             return await patientRepository.GetPatientAsync(email);
         }
 
+        public async Task<bool> AddPermittedDoctorIdAsync(string email, string doctorSwasthyaId)
+        {
+            return await patientRepository.AddPermittedDoctorIdAsync(email, doctorSwasthyaId);
+        }
+
         private string CreatePasswordHash(string password)
         {
             password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);

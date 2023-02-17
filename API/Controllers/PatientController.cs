@@ -93,5 +93,18 @@ namespace API.Controllers
             var patient = await patientOperations.GetPatientAsync(User.FindFirstValue(ClaimTypes.Email));
             return Ok(patient.ToAPIModel());
         }
+
+        [HttpPost]
+        [Route("permitDoctor")]
+        public async Task <ActionResult> AddPermittedDoctorIdAsync(PermitDoctorRequest request)
+        {
+            var response = await patientOperations.AddPermittedDoctorIdAsync(User.FindFirstValue(ClaimTypes.Email), request.doctorSwasthyaId);
+            if (response)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest("Invalid Patient");
+        }
     }
 }
