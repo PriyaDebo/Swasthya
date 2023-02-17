@@ -46,7 +46,8 @@ namespace DAL.Repositories
                 SwasthyaId = swasthyaId,
                 Name = name,
                 RegistrationNumber = registrationNumber,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                PatientIds = new List<string>()
             };
 
             var doctorData = await container.CreateItemAsync<DoctorData>(doctor);
@@ -74,6 +75,7 @@ namespace DAL.Repositories
                 SwasthyaId = responseResource.SwasthyaId,
                 PhoneNumber = responseResource.PhoneNumber,
                 RegistrationNumber = responseResource.RegistrationNumber,
+                PatientIds = responseResource.PatientIds,
             };
 
             return doctor;

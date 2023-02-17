@@ -13,5 +13,7 @@
         string Address { get; }
 
         string PhoneNumber { get; }
+
+        List<string> PatientIds { get; }
     }
 }

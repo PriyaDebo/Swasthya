@@ -17,5 +17,7 @@ namespace Common.DTO
         public string PhoneNumber { get; set; }
 
         public string DateOfBirth { get; set; }
+
+        public List<string> DoctorIds { get; set; }
     }
 }

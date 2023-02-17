@@ -34,7 +34,8 @@ namespace DAL.Repositories
                 Password = password,
                 Name = name,
                 Address = address,
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                PatientIds = new List<string>()
             };
 
             var hospitalCreated = await container.CreateItemAsync<HospitalData>(hospital);
@@ -61,6 +62,7 @@ namespace DAL.Repositories
                 Password = responseResource.Password,
                 Address = responseResource.Address,
                 PhoneNumber = responseResource.PhoneNumber,
+                PatientIds = responseResource.PatientIds
             };
 
             return hospital;

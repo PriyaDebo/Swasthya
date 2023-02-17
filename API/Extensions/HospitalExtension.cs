@@ -12,7 +12,8 @@ namespace API.Extensions
                 Email = hospital.Email,
                 Name = hospital.Name,
                 PhoneNumber = hospital.PhoneNumber,
-                Address = hospital.Address
+                Address = hospital.Address,
+                PatientIds = hospital.PatientIds,
             };
 
             return model;

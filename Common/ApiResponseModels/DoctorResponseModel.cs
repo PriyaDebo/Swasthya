@@ -11,5 +11,7 @@
         public string SwasthyaId { get; set; }
 
         public string RegistrationNumber { get; set; }
+
+        public List<string> PatientIds { get; set; }
     }
 }

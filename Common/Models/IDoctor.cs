@@ -16,5 +16,7 @@
 
         string PhoneNumber { get; }
 
+        List<string> PatientIds { get; }
+
     }
 }

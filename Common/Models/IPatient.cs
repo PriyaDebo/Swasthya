@@ -15,5 +15,7 @@
         string PhoneNumber { get; }
 
         string DateOfBirth { get; }
+
+        List<string> DoctorIds { get; }
     }
 }

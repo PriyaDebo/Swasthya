@@ -13,6 +13,7 @@ namespace API.Extensions
                 Name = patient.Name,
                 PhoneNumber = patient.PhoneNumber,
                 DateOfBirth = patient.DateOfBirth,
+                DoctorIds = patient.DoctorIds,
             };
 
             return model;

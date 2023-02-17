@@ -14,6 +14,7 @@ namespace API.Extensions
                 SwasthyaId = doctor.SwasthyaId,
                 PhoneNumber = doctor.PhoneNumber,
                 RegistrationNumber = doctor.RegistrationNumber,
+                PatientIds = doctor.PatientIds,
             };
 
             return model;

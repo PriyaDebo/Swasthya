@@ -11,6 +11,17 @@ namespace DAL.Models
         {
         }
 
+        public HospitalData(HospitalData hospital)
+        {
+            Id = hospital.Id;
+            Email = hospital.Email;
+            Password = hospital.Password;
+            Name = hospital.Name;
+            Address = hospital.Address;
+            PhoneNumber = hospital.PhoneNumber;
+            PatientIds = hospital.PatientIds;
+        }
+
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }
 
@@ -28,5 +39,8 @@ namespace DAL.Models
 
         [JsonProperty(PropertyName = "phoneNumber")]
         public string PhoneNumber { get; set; }
+
+        [JsonProperty(PropertyName = "patientIds")]
+        public List<string> PatientIds { get; set;}
     }
 }
