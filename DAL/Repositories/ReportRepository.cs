@@ -10,27 +10,43 @@ namespace DAL.Repositories
     {
         private readonly Database database;
         private readonly Container container;
-        private readonly BlobContainerClient blobServiceClient;
+        private readonly BlobContainerClient blobContainerClient;
 
         public ReportRepository(CosmosClient client, BlobServiceClient blobServiceClient)
         {
             this.database = client.GetDatabase("Swasthya");
             this.container = database.GetContainer("Reports");
-            this.blobServiceClient = blobServiceClient.GetBlobContainerClient("reports");
+            this.blobContainerClient = blobServiceClient.GetBlobContainerClient("reports");
         }
 
-        public async Task<ReportData> AddReportAsync(string email, string title, string report)
+        public async Task<ReportData> AddReportAsync(string email, string title, Stream report)
         {
+            var blobName = Guid.NewGuid().ToString();
+            var blob = blobContainerClient.GetBlobClient(blobName);
+            await blob.UploadAsync(report);
+
             var medicalReport = new ReportData()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
                 Title = title,
-                MedicalReport = report
+                MedicalReport = blobName
             };
 
             var reportAdded = await container.CreateItemAsync<ReportData>(medicalReport);
             return reportAdded.Resource;
+        }
+
+        public async Task<Stream> GetReportByBlobNameAsync(string blobName)
+        {
+            Stream report = new MemoryStream();
+            var blob = blobContainerClient.GetBlobClient(blobName);
+            if (await blob.ExistsAsync())
+            {
+                await blob.UploadAsync(report);
+            }
+
+            return report;
         }
 
         public async Task<IEnumerable<IReport>> GetReportsByEmailAsync(string email)
@@ -39,6 +55,7 @@ namespace DAL.Repositories
             var query = $"SELECT * from Reports WHERE Reports.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
             var iterator = container.GetItemQueryIterator<ReportData>(queryDefinition);
+
             while (iterator.HasMoreResults)
             {
                 var response = await iterator.ReadNextAsync();
@@ -61,7 +78,7 @@ namespace DAL.Repositories
         //public async Task<object> ReportExists(string reference)
         //{
         //    Stream rep;
-        //    var blob = blobServiceClient.GetBlobClient("guid");
+        //    var blob = blobContainerClient.GetBlobClient("guid");
         //    var report = await blob.UploadAsync(rep);
         //    var blobUri = blob.Uri.AbsoluteUri;
         //    await blob.DownloadToAsync(rep);

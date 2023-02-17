@@ -6,6 +6,6 @@
 
         public string title { get; set; }
 
-        public string report { get; set; }
+        public Stream report { get; set; }
     }
 }

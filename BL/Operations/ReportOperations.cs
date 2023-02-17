@@ -12,7 +12,7 @@ namespace BL.Operations
             this.reportRepository = reportRepository;
         }
 
-        public async Task<IReport> AddReportAsync(string email, string title, string report)
+        public async Task<IReport> AddReportAsync(string email, string title, Stream report)
         {
             var reportResponse = await reportRepository.AddReportAsync(email, title, report);
             return reportResponse;
@@ -28,6 +28,12 @@ namespace BL.Operations
         {
             var reportsResponse = await reportRepository.GetReportsByEmailAsync(email);
             return reportsResponse;
+        }
+
+        public async Task<Stream> GetReportByBlobNameAsync(string blobName)
+        {
+            var report = await reportRepository.GetReportByBlobNameAsync(blobName);
+            return report;
         }
     }
 }

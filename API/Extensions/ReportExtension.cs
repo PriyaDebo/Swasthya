@@ -39,5 +39,16 @@ namespace API.Extensions
 
             return names;
         }
+
+        public static ReportStreamResponseModel ReportStreamToAPIModel(this Stream report)
+        {
+            var model = new ReportStreamResponseModel
+            {
+                Report = report
+            };
+
+            return model;
+        }
+
     }
 }

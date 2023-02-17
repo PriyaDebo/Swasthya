@@ -74,6 +74,8 @@ builder.Services.AddScoped<DoctorOperations>();
 builder.Services.AddScoped<DoctorRepository>();
 builder.Services.AddScoped<HospitalOperations>();
 builder.Services.AddScoped<HospitalRepository>();
+builder.Services.AddScoped<ReportOperations>();
+builder.Services.AddScoped<ReportRepository>();
 builder.Services.AddScoped(sp => new CosmosClient(endpoint, primaryKey));
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
