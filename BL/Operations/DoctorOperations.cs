@@ -38,7 +38,7 @@ namespace BL.Operations
 
                 foreach (var patientId in doctor.PatientIds)
                 {
-                    var patient = await patientRepository.GetPatientByIdlAsync(patientId);
+                    var patient = await patientRepository.GetPatientByIdAsync(patientId);
                     if (patient != null)
                     {
                         doctor.Patients.Add(patient);
@@ -74,7 +74,7 @@ namespace BL.Operations
 
         public async Task<IDoctor> LoginDoctorAsync(string email, string password)
         {
-            var doctor = await doctorRepository.GetDoctorAsync(email);
+            var doctor = await doctorRepository.GetDoctorByEmailAsync(email);
 
             if (doctor == null)
             {
@@ -91,7 +91,7 @@ namespace BL.Operations
 
         public async Task<IDoctor> GetDoctorAsync(string email)
         {
-            var doctor = await doctorRepository.GetDoctorAsync(email);
+            var doctor = await doctorRepository.GetDoctorByEmailAsync(email);
             if (doctor != null)
             {
                 return await AddPatientData(doctor); ;

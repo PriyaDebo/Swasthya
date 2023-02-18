@@ -45,5 +45,8 @@ namespace DAL.Models
 
         [JsonProperty(PropertyName = "doctorIds")]
         public List<string> DoctorIds { get; set; }
+
+        [JsonIgnore]
+        public List<IDoctor> Doctors { get; set; }
     }
 }

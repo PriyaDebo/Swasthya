@@ -19,5 +19,7 @@ namespace Common.DTO
         public string DateOfBirth { get; set; }
 
         public List<string> DoctorIds { get; set; }
+
+        public List<IDoctor> Doctors { get; set; }
     }
 }

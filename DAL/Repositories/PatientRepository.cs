@@ -73,7 +73,7 @@ namespace DAL.Repositories
             return patient;
         }
 
-        public async Task<IPatient> GetPatientByIdlAsync(string id)
+        public async Task<IPatient> GetPatientByIdAsync(string id)
         {
             var query = $"SELECT * FROM Patient WHERE Patient.id = @id";
             var queryDefinition = new QueryDefinition(query).WithParameter("@id", id);

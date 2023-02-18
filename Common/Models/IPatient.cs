@@ -17,5 +17,7 @@
         string DateOfBirth { get; }
 
         List<string> DoctorIds { get; }
+
+        List<IDoctor> Doctors { get; }
     }
 }
