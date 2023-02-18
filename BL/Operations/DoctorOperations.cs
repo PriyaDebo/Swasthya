@@ -1,4 +1,5 @@
 ﻿using BCrypt.Net;
+using Common.DTO;
 using Common.Models;
 using DAL.Repositories;
 
@@ -7,10 +8,45 @@ namespace BL.Operations
     public class DoctorOperations
     {
         DoctorRepository doctorRepository;
+        PatientRepository patientRepository;
 
-        public DoctorOperations(DoctorRepository doctorRepository)
+        public DoctorOperations(DoctorRepository doctorRepository, PatientRepository patientRepository)
         {
             this.doctorRepository = doctorRepository;
+            this.patientRepository = patientRepository;
+        }
+
+        public async Task<IDoctor> AddPatientData(IDoctor doctorResponse)
+        {
+            var doctor = new Doctor()
+            {
+                Id = doctorResponse.Id,
+                Name = doctorResponse.Name,
+                Email = doctorResponse.Email,
+                SwasthyaId = doctorResponse.SwasthyaId,
+                PhoneNumber = doctorResponse.PhoneNumber,
+                RegistrationNumber = doctorResponse.RegistrationNumber,
+                PatientIds = doctorResponse.PatientIds
+            };
+
+            if (doctor.PatientIds != null)
+            {
+                if (doctor.Patients == null)
+                {
+                    doctor.Patients = new List<IPatient>();
+                }
+
+                foreach (var patientId in doctor.PatientIds)
+                {
+                    var patient = await patientRepository.GetPatientByIdlAsync(patientId);
+                    if (patient != null)
+                    {
+                        doctor.Patients.Add(patient);
+                    }
+                }
+            }
+
+            return doctor;
         }
 
         public async Task<IDoctor> RegisterDoctorAsync(string email, string password, string name, string phoneNumber, string registrationNumber)
@@ -50,12 +86,18 @@ namespace BL.Operations
                 return null;
             }
 
-            return doctor;
+            return await AddPatientData(doctor);
         }
 
         public async Task<IDoctor> GetDoctorAsync(string email)
         {
-            return await doctorRepository.GetDoctorAsync(email);
+            var doctor = await doctorRepository.GetDoctorAsync(email);
+            if (doctor != null)
+            {
+                return await AddPatientData(doctor); ;
+            }
+
+            return null;
         }
 
         private string CreatePasswordHash(string password)

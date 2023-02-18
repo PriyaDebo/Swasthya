@@ -2,6 +2,8 @@
 using BL.Operations;
 using Common.ApiRequestModels.DoctorRequestModels;
 using Common.ApiResponseModels;
+using Common.ApiResponseModels.DoctorResponseModels;
+using Common.ApiResponseModels.PatientResponseModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

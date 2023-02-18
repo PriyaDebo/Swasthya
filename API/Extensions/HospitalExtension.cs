@@ -1,4 +1,4 @@
-﻿using Common.ApiResponseModels;
+﻿using Common.ApiResponseModels.HospitalResponseModels;
 using Common.Models;
 
 namespace API.Extensions

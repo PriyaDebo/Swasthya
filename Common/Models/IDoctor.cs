@@ -18,5 +18,7 @@
 
         List<string> PatientIds { get; }
 
+        List<IPatient> Patients { get; }
+
     }
 }

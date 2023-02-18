@@ -35,7 +35,7 @@ namespace BL.Operations
 
         public async Task<IPatient> LoginPatientAsync(string email, string password)
         {
-            var patient = await patientRepository.GetPatientAsync(email);
+            var patient = await patientRepository.GetPatientByEmailAsync(email);
 
             if (patient == null)
             {
@@ -53,12 +53,12 @@ namespace BL.Operations
 
         public async Task<IPatient> GetPatientAsync(string email)
         {
-            return await patientRepository.GetPatientAsync(email);
+            return await patientRepository.GetPatientByEmailAsync(email);
         }
 
         public async Task<bool> AddPermittedDoctorIdAsync(string email, string doctorSwasthyaId)
         {
-            var patient = await patientRepository.GetPatientAsync(email);
+            var patient = await patientRepository.GetPatientByEmailAsync(email);
             if (patient == null)
             {
                 return false;

@@ -45,10 +45,38 @@ namespace DAL.Repositories
             return patientRegistered.Resource;
         }
 
-        public async Task<IPatient> GetPatientAsync(string email)
+        public async Task<IPatient> GetPatientByEmailAsync(string email)
         {
             var query = $"SELECT * FROM Patient WHERE Patient.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
+            var patientResponse = container.GetItemQueryIterator<PatientData>(queryDefinition);
+            var response = await patientResponse.ReadNextAsync();
+            var responseResource = response.Resource.FirstOrDefault();
+
+            if (responseResource == null)
+            {
+                return null;
+            }
+
+            var patient = new Patient()
+            {
+                Id = responseResource.Id,
+                Name = responseResource.Name,
+                Email = responseResource.Email,
+                Password = responseResource.Password,
+                SwasthyaId = responseResource.SwasthyaId,
+                PhoneNumber = responseResource.PhoneNumber,
+                DateOfBirth = responseResource.DateOfBirth,
+                DoctorIds = responseResource.DoctorIds
+            };
+
+            return patient;
+        }
+
+        public async Task<IPatient> GetPatientByIdlAsync(string id)
+        {
+            var query = $"SELECT * FROM Patient WHERE Patient.id = @id";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@id", id);
             var patientResponse = container.GetItemQueryIterator<PatientData>(queryDefinition);
             var response = await patientResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();

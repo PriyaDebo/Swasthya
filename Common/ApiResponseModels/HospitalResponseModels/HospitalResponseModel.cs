@@ -1,4 +1,4 @@
-﻿namespace Common.ApiResponseModels
+﻿namespace Common.ApiResponseModels.HospitalResponseModels
 {
     public class HospitalResponseModel
     {

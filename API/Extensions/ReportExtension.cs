@@ -1,4 +1,4 @@
-﻿using Common.ApiResponseModels;
+﻿using Common.ApiResponseModels.ReportResponseModels;
 using Common.Models;
 
 namespace API.Extensions

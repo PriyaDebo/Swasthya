@@ -1,7 +1,7 @@
 ﻿using API.Extensions;
 using BL.Operations;
 using Common.ApiRequestModels.ReportRequestModels;
-using Common.ApiResponseModels;
+using Common.ApiResponseModels.ReportResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
