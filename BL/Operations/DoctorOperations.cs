@@ -16,39 +16,6 @@ namespace BL.Operations
             this.patientRepository = patientRepository;
         }
 
-        public async Task<IDoctor> AddPatientData(IDoctor doctorResponse)
-        {
-            var doctor = new Doctor()
-            {
-                Id = doctorResponse.Id,
-                Name = doctorResponse.Name,
-                Email = doctorResponse.Email,
-                SwasthyaId = doctorResponse.SwasthyaId,
-                PhoneNumber = doctorResponse.PhoneNumber,
-                RegistrationNumber = doctorResponse.RegistrationNumber,
-                PatientIds = doctorResponse.PatientIds
-            };
-
-            if (doctor.PatientIds != null)
-            {
-                if (doctor.Patients == null)
-                {
-                    doctor.Patients = new List<IPatient>();
-                }
-
-                foreach (var patientId in doctor.PatientIds)
-                {
-                    var patient = await patientRepository.GetPatientByIdAsync(patientId);
-                    if (patient != null)
-                    {
-                        doctor.Patients.Add(patient);
-                    }
-                }
-            }
-
-            return doctor;
-        }
-
         public async Task<IDoctor> RegisterDoctorAsync(string email, string password, string name, string phoneNumber, string registrationNumber)
         {
             var emailExists = await doctorRepository.EmailExistsAsync(email);
@@ -98,6 +65,39 @@ namespace BL.Operations
             }
 
             return null;
+        }
+
+        private async Task<IDoctor> AddPatientData(IDoctor doctorResponse)
+        {
+            var doctor = new Doctor()
+            {
+                Id = doctorResponse.Id,
+                Name = doctorResponse.Name,
+                Email = doctorResponse.Email,
+                SwasthyaId = doctorResponse.SwasthyaId,
+                PhoneNumber = doctorResponse.PhoneNumber,
+                RegistrationNumber = doctorResponse.RegistrationNumber,
+                PatientIds = doctorResponse.PatientIds
+            };
+
+            if (doctor.PatientIds != null)
+            {
+                if (doctor.Patients == null)
+                {
+                    doctor.Patients = new List<IPatient>();
+                }
+
+                foreach (var patientId in doctor.PatientIds)
+                {
+                    var patient = await patientRepository.GetPatientByIdAsync(patientId);
+                    if (patient != null)
+                    {
+                        doctor.Patients.Add(patient);
+                    }
+                }
+            }
+
+            return doctor;
         }
 
         private string CreatePasswordHash(string password)

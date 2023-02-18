@@ -1,4 +1,6 @@
-﻿namespace Common.ApiResponseModels.HospitalResponseModels
+﻿using Common.ApiResponseModels.PatientResponseModels;
+
+namespace Common.ApiResponseModels.HospitalResponseModels
 {
     public class HospitalResponseModel
     {
@@ -12,6 +14,6 @@
 
         public string Address { get; set; }
 
-        public List<string> PatientIds { get; set; }
+        public List<PatientReferenceModel> Patients { get; set; }
     }
 }

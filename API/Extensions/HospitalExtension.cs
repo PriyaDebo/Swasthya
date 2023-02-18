@@ -1,4 +1,5 @@
 ﻿using Common.ApiResponseModels.HospitalResponseModels;
+using Common.ApiResponseModels.PatientResponseModels;
 using Common.Models;
 
 namespace API.Extensions
@@ -13,8 +14,20 @@ namespace API.Extensions
                 Name = hospital.Name,
                 PhoneNumber = hospital.PhoneNumber,
                 Address = hospital.Address,
-                PatientIds = hospital.PatientIds,
             };
+
+            if (hospital.PatientIds != null )
+            {
+                if (model.Patients == null)
+                {
+                    model.Patients = new List<PatientReferenceModel>();
+                }
+
+                foreach (var patient in hospital.Patients)
+                {
+                    model.Patients.Add(patient.BasicInfoToAPIModel());
+                }
+            }
 
             return model;
         }

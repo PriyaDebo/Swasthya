@@ -16,40 +16,6 @@ namespace BL.Operations
             this.doctorRepository = doctorRepository;
         }
 
-
-        public async Task<IPatient> AddDoctorData(IPatient patientResponse)
-        {
-            var patient = new Patient()
-            {
-                Id = patientResponse.Id,
-                Name = patientResponse.Name,
-                Email = patientResponse.Email,
-                DateOfBirth = patientResponse.DateOfBirth,
-                SwasthyaId = patientResponse.SwasthyaId,
-                PhoneNumber = patientResponse.PhoneNumber,
-                DoctorIds = patientResponse.DoctorIds,
-            };
-
-            if (patient.DoctorIds != null)
-            {
-                if (patient.Doctors == null)
-                {
-                    patient.Doctors = new List<IDoctor>();
-                }
-
-                foreach (var doctorId in patient.DoctorIds)
-                {
-                    var doctor = await doctorRepository.GetDoctorByIdAsync(doctorId);
-                    if (doctor != null)
-                    {
-                        patient.Doctors.Add(doctor);
-                    }
-                }
-            }
-
-            return patient;
-        }
-
         public async Task<IPatient> CreatePatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
         {
             var emailExists = await patientRepository.EmailExistsAsync(email);
@@ -110,6 +76,39 @@ namespace BL.Operations
             var doctorAdded = await patientRepository.AddPermittedDoctorIdAsync(email, doctor.Id);
 
             return patientAdded && doctorAdded;
+        }
+
+        private async Task<IPatient> AddDoctorData(IPatient patientResponse)
+        {
+            var patient = new Patient()
+            {
+                Id = patientResponse.Id,
+                Name = patientResponse.Name,
+                Email = patientResponse.Email,
+                DateOfBirth = patientResponse.DateOfBirth,
+                SwasthyaId = patientResponse.SwasthyaId,
+                PhoneNumber = patientResponse.PhoneNumber,
+                DoctorIds = patientResponse.DoctorIds,
+            };
+
+            if (patient.DoctorIds != null)
+            {
+                if (patient.Doctors == null)
+                {
+                    patient.Doctors = new List<IDoctor>();
+                }
+
+                foreach (var doctorId in patient.DoctorIds)
+                {
+                    var doctor = await doctorRepository.GetDoctorByIdAsync(doctorId);
+                    if (doctor != null)
+                    {
+                        patient.Doctors.Add(doctor);
+                    }
+                }
+            }
+
+            return patient;
         }
 
         private string CreatePasswordHash(string password)

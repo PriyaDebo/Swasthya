@@ -17,5 +17,7 @@ namespace Common.DTO
         public string PhoneNumber { get; set; }
 
         public List<string> PatientIds { get; set; }
+
+        public List<IPatient> Patients { get; set; }
     }
 }

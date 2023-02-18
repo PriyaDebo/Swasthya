@@ -86,5 +86,23 @@ namespace API.Controllers
             return Ok(hospital.ToAPIModel());
         }
 
+        [HttpPost]
+        [Route("addPatientPermit")]
+        public async Task<ActionResult> AddPatientPermitAsync(GetPatientPermitRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var response = await hospitalOperations.AddPermittedPatientAsync(User.FindFirstValue(ClaimTypes.Email), request.PatientSwasthyaId);
+            if (response)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest("Invalid Request");
+        }
+
     }
 }

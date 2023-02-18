@@ -15,7 +15,7 @@ namespace DAL.Repositories
             container = database.GetContainer("Hospital");
         }
 
-        public async Task<Boolean?> EmailExistsAsync(string email)
+        public async Task<Boolean> EmailExistsAsync(string email)
         {
             var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
@@ -42,7 +42,7 @@ namespace DAL.Repositories
             return hospitalCreated.Resource;
         }
 
-        public async Task<IHospital?> GetHospitalAsync(string email)
+        public async Task<IHospital> GetHospitalByEmailAsync(string email)
         {
             var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
@@ -67,6 +67,26 @@ namespace DAL.Repositories
             };
 
             return hospital;
+        }
+
+        public async Task<bool> AddPatientAsync(string email, string patientId)
+        {
+            var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
+            var hospitalResponse = container.GetItemQueryIterator<HospitalData?>(queryDefinition);
+            var response = await hospitalResponse.ReadNextAsync();
+            var responseResource = response.Resource.FirstOrDefault();
+
+            if (responseResource == null)
+            {
+                return false;
+            }
+
+            var newHospital = new HospitalData(responseResource);
+
+            newHospital.PatientIds.Add(patientId);
+            await container.ReplaceItemAsync<HospitalData>(newHospital, newHospital.Id);
+            return true;
         }
     }
 }
