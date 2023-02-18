@@ -1,6 +1,6 @@
 ﻿namespace Common.ApiRequestModels.ReportRequestModels
 {
-    public class AddReportRequestModel
+    public class AddReportByHospitalRequest
     {
         public string email { get; set; }
 

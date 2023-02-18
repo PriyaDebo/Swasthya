@@ -1,6 +1,6 @@
 ﻿namespace Common.ApiRequestModels.ReportRequestModels
 {
-    public class GetReportByBlobNameRequestModel
+    public class GetReportByBlobNameRequest
     {
         public string blobName { get; set; }
     }

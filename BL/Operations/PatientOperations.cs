@@ -7,10 +7,12 @@ namespace BL.Operations
     public class PatientOperations
     {
         PatientRepository patientRepository;
+        DoctorRepository doctorRepository;
 
-        public PatientOperations(PatientRepository patientRepository)
+        public PatientOperations(PatientRepository patientRepository, DoctorRepository doctorRepository)
         {
             this.patientRepository = patientRepository;
+            this.doctorRepository = doctorRepository;
         }
 
         public async Task<IPatient> CreatePatientAsync(string email, string password, string name, string phoneNumber, string dateOfBirth)
@@ -56,7 +58,22 @@ namespace BL.Operations
 
         public async Task<bool> AddPermittedDoctorIdAsync(string email, string doctorSwasthyaId)
         {
-            return await patientRepository.AddPermittedDoctorIdAsync(email, doctorSwasthyaId);
+            var patient = await patientRepository.GetPatientAsync(email);
+            if (patient == null)
+            {
+                return false;
+            }
+
+            var doctor = await doctorRepository.GetDoctorIdBySwasthyaIdAsync(doctorSwasthyaId);
+            if (doctor == null)
+            {
+                return false;
+            }
+
+            var patientAdded = await doctorRepository.AddPatientIdAsync(doctor.Email, patient.Id);
+            var doctorAdded = await patientRepository.AddPermittedDoctorIdAsync(email, doctor.Id);
+
+            return patientAdded && doctorAdded;
         }
 
         private string CreatePasswordHash(string password)

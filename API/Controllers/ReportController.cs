@@ -4,6 +4,7 @@ using Common.ApiRequestModels.ReportRequestModels;
 using Common.ApiResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -18,10 +19,11 @@ namespace API.Controllers
             this.reportOperations = reportOperations;
         }
 
+        //Hospital
         [HttpPut]
-        [Route("addReport")]
+        [Route("addReportByHospital")]
         [Authorize(Constants.HospitalPolicy)]
-        public async Task<ActionResult<ReportResponseModel>> AddReportAsync(AddReportRequestModel request)
+        public async Task<ActionResult<ReportResponseModel>> AddReportByHospitalAsync(AddReportByHospitalRequest request)
         {
             if(!ModelState.IsValid)
             {
@@ -37,12 +39,13 @@ namespace API.Controllers
             return Ok(report.ToAPIModel());
         }
 
+        //Doctor
         [HttpGet]
-        [Route("getReportsByEmail")]
-        [Authorize(Constants.PatientPolicy + "," + Constants.PatientPolicy)]
-        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetResportsByEmailAsync(GetReportByEmailRequestModel request)
+        [Route("getReportsByEmailForDoctor")]
+        [Authorize(Constants.DoctorPolicy)]
+        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailForDoctorAsync(GetReportByEmailRequest request)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
@@ -52,9 +55,52 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("getReportByBlobName")]
-        [Authorize(Constants.PatientPolicy + "," + Constants.PatientPolicy)]
-        public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameAsync(GetReportByBlobNameRequestModel request)
+        [Route("getReportByBlobNameForDoctor")]
+        [Authorize(Constants.DoctorPolicy)]
+        public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForDoctorAsync(GetReportByBlobNameRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var report = await reportOperations.GetReportByBlobNameAsync(request.blobName);
+            return Ok(report.ReportStreamToAPIModel());
+        }
+
+        //Patient
+        [HttpPut]
+        [Route("addReportByPatient")]
+        [Authorize(Constants.PatientPolicy)]
+        public async Task<ActionResult<ReportResponseModel>> AddReportByPatientAsync(AddReportByPatientRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var report = await reportOperations.AddReportAsync(User.FindFirstValue(ClaimTypes.Email), request.title, request.report);
+            if (report == null)
+            {
+                return BadRequest("Failed to add report.");
+            }
+
+            return Ok(report.ToAPIModel());
+        }
+
+        [HttpGet]
+        [Route("getReportsByEmailForPatient")]
+        [Authorize(Constants.PatientPolicy)]
+        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailForPatientAsync()
+        {
+           var reports = await reportOperations.GetReportsByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            return Ok(reports.NamesToAPIModel());
+        }
+
+        [HttpGet]
+        [Route("getReportByBlobNameForPatient")]
+        [Authorize(Constants.PatientPolicy)]
+        public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForPatientAsync(GetReportByBlobNameRequest request)
         {
             if(!ModelState.IsValid)
             {
@@ -64,6 +110,5 @@ namespace API.Controllers
             var report = await reportOperations.GetReportByBlobNameAsync(request.blobName);
             return Ok(report.ReportStreamToAPIModel());
         }
-
     }
 }

@@ -104,7 +104,7 @@ namespace API.Controllers
                 return Ok(response);
             }
 
-            return BadRequest("Invalid Patient");
+            return BadRequest("Invalid Request");
         }
     }
 }

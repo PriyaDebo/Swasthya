@@ -54,7 +54,7 @@ namespace DAL.Repositories
             return doctorData;
         }
 
-        public async Task<IDoctor> GetDoctorAsync(string email)
+        public async Task<IDoctor?> GetDoctorAsync(string email)
         {
             var query = $"SELECT * FROM Doctor WHERE Doctor.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
@@ -80,6 +80,50 @@ namespace DAL.Repositories
             };
 
             return doctor;
+        }
+
+        public async Task<IDoctor?> GetDoctorIdBySwasthyaIdAsync(string swasthyaId)
+        {
+            var query = $"SELECT * FROM Doctor WHERE Doctor.swasthyaId = @swasthyaId";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@email", swasthyaId);
+            var doctorResponse = container.GetItemQueryIterator<DoctorData>(queryDefinition);
+            var response = await doctorResponse.ReadNextAsync();
+            var responseResource = response.Resource.FirstOrDefault();
+
+            if (responseResource == null)
+            {
+                return null;
+            }
+
+            var doctor = new Doctor()
+            {
+                Id = responseResource.Id,
+                Email = responseResource.Email,
+            };
+
+            return doctor;
+        }
+
+        public async Task<bool> AddPatientIdAsync(string email, string patientId)
+        {
+            var query = $"SELECT * FROM Doctor WHERE Doctor.email = @email";
+            var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
+            var doctorResponse = container.GetItemQueryIterator<DoctorData>(queryDefinition);
+            var response = await doctorResponse.ReadNextAsync();
+            var responseResource = response.Resource.FirstOrDefault();
+
+            if (responseResource == null)
+            {
+                return false;
+            }
+
+            var newDoctor = new DoctorData(responseResource);
+
+            newDoctor.PatientIds ??= new List<string>();
+
+            newDoctor.PatientIds.Add(patientId);
+            await container.ReplaceItemAsync<DoctorData>(newDoctor, newDoctor.Id);
+            return true;
         }
     }
 }

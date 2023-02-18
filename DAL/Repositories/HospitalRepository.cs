@@ -15,17 +15,17 @@ namespace DAL.Repositories
             container = database.GetContainer("Hospital");
         }
 
-        public async Task<Boolean> EmailExistsAsync(string email)
+        public async Task<Boolean?> EmailExistsAsync(string email)
         {
             var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var emailResponse = container.GetItemQueryIterator<HospitalData>(queryDefinition);
+            var emailResponse = container.GetItemQueryIterator<HospitalData?>(queryDefinition);
             var response = await emailResponse.ReadNextAsync();
 
             return response.Resource.FirstOrDefault() != null;
         }
 
-        public async Task<HospitalData> CreateHospitalAsync(string email, string password, string name, string address, string phoneNumber)
+        public async Task<HospitalData?> CreateHospitalAsync(string email, string password, string name, string address, string phoneNumber)
         {
             var hospital = new HospitalData()
             {
@@ -38,15 +38,15 @@ namespace DAL.Repositories
                 PatientIds = new List<string>()
             };
 
-            var hospitalCreated = await container.CreateItemAsync<HospitalData>(hospital);
+            var hospitalCreated = await container.CreateItemAsync<HospitalData?>(hospital);
             return hospitalCreated.Resource;
         }
 
-        public async Task<IHospital> GetHospitalAsync(string email)
+        public async Task<IHospital?> GetHospitalAsync(string email)
         {
             var query = $"SELECT * FROM Hospital WHERE Hospital.email = @email";
             var queryDefinition = new QueryDefinition(query).WithParameter("@email", email);
-            var hospitalResponse = container.GetItemQueryIterator<HospitalData>(queryDefinition);
+            var hospitalResponse = container.GetItemQueryIterator<HospitalData?>(queryDefinition);
             var response = await hospitalResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();
 
