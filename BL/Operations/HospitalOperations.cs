@@ -1,20 +1,19 @@
-﻿using Common.Models;
+﻿using BCrypt.Net;
+using Common.DTO;
+using Common.Models;
 using DAL.Repositories;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace BL.Operations
 {
     public class HospitalOperations
     {
-        private string token;
         HospitalRepository hospitalRepository;
+        PatientRepository patientRepository;
 
-        public HospitalOperations(string token, HospitalRepository hospitalRepository)
+        public HospitalOperations(HospitalRepository hospitalRepository, PatientRepository patientRepository)
         {
-            this.token = token;
             this.hospitalRepository = hospitalRepository;
+            this.patientRepository = patientRepository;
         }
 
         public async Task<IHospital> RegisterHospital(string email, string password, string name, string address, string phoneNumber)
@@ -26,44 +25,94 @@ namespace BL.Operations
                 return null;
             }
 
-            var hospitalResponse = await hospitalRepository.RegisterHospitalAsync(email, password, name, address, phoneNumber);
+            password = CreatePasswordHash(password);
+
+            var hospitalResponse = await hospitalRepository.CreateHospitalAsync(email, password, name, address, phoneNumber);
             return hospitalResponse;
         }
 
-        private string CreateHospitalJwtToken(IHospital hospital)
+        public async Task<IHospital> LoginHospitalAsync(string email, string password)
         {
-            List<Claim> claims = new()
+            var hospital = await hospitalRepository.GetHospitalByEmailAsync(email);
+
+            if (hospital == null)
             {
-                new Claim(ClaimTypes.NameIdentifier, hospital.Name),
-                new Claim(ClaimTypes.Email, hospital.Email),
-                new Claim(ClaimTypes.StreetAddress, hospital.Address),
-                new Claim(ClaimTypes.MobilePhone, hospital.PhoneNumber)
-            };
-
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(token));
-
-            var loginCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(5),
-                signingCredentials: loginCredentials);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-            return jwt;
-        }
-
-        public async Task<string> LoginHospitalAsync(string email, string password)
-        {
-            var hospitalResponse = await hospitalRepository.LoginHospitalAsync(email, password);
-
-            if (hospitalResponse != null)
-            {
-                return CreateHospitalJwtToken(hospitalResponse);
+                return null;
             }
 
-            return null;
+
+            if (!VerifyPasswordHash(password, hospital.Password))
+            {
+                return null;
+            }
+
+            return await AddPatientData(hospital);
+        }
+
+        public async Task<IHospital> GetHospitalAsync(string email)
+        {
+            var hospital = await hospitalRepository.GetHospitalByEmailAsync(email);
+            return await AddPatientData(hospital);
+        }
+
+        public async Task<bool> AddPermittedPatientAsync(string email, string patientSwasthyaId)
+        {
+            var hospital = await hospitalRepository.GetHospitalByEmailAsync(email);
+            if (hospital == null)
+            {
+                return false;
+            }
+
+            var patient = await patientRepository.GetPatientBySwasthyaIdAsync(patientSwasthyaId);
+            if (patient == null)
+            {
+                return false;
+            }
+
+            var patientAdded = await hospitalRepository.AddPatientAsync(email, patient.Id);
+            return patientAdded;
+        }
+
+        private async Task<IHospital> AddPatientData(IHospital hospitalResponse)
+        {
+            var hospital = new Hospital()
+            {
+                Name = hospitalResponse.Name,
+                Email = hospitalResponse.Email,
+                PhoneNumber = hospitalResponse.PhoneNumber,
+                Address = hospitalResponse.Address,
+                PatientIds = hospitalResponse.PatientIds,
+            };
+
+            if (hospital.PatientIds != null)
+            {
+                if (hospital.Patients == null)
+                {
+                    hospital.Patients = new List<IPatient>();
+                }
+
+                foreach (var patientId in hospital.PatientIds)
+                {
+                    var patient = await patientRepository.GetPatientByIdAsync(patientId);
+                    if (patient != null)
+                    {
+                        hospital.Patients.Add(patient);
+                    }
+                }
+            }
+
+            return hospital;
+        }
+
+        private string CreatePasswordHash(string password)
+        {
+            password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);
+            return password;
+        }
+
+        private bool VerifyPasswordHash(string passwordInput, string passwordOriginal)
+        {
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
     }
 }

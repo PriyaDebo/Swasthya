@@ -10,8 +10,14 @@
 
         string Name { get; }
 
+        string SwasthyaId { get; }
+
         string PhoneNumber { get; }
 
         string DateOfBirth { get; }
+
+        List<string> DoctorIds { get; }
+
+        List<IDoctor> Doctors { get; }
     }
 }

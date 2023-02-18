@@ -19,6 +19,7 @@ namespace DAL.Models
             Password = doctor.Password;
             RegistrationNumber = doctor.RegistrationNumber;
             PhoneNumber = doctor.PhoneNumber;
+            PatientIds = doctor.PatientIds;
         }
 
         [JsonProperty(PropertyName = "id")]
@@ -33,10 +34,19 @@ namespace DAL.Models
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "swasthyaId")]
+        public string SwasthyaId { get; set; }
+
         [JsonProperty(PropertyName = "registrationNumber")]
-        public string RegistrationNumber{ get; set; }
+        public string RegistrationNumber { get; set; }
 
         [JsonProperty(PropertyName = "phone")]
         public string PhoneNumber { get; set; }
+
+        [JsonProperty(PropertyName = "patientIds")]
+        public List<string> PatientIds { get; set; }
+
+        [JsonIgnore]
+        public List<IPatient> Patients { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace DAL.Models
             Name = patient.Name;
             PhoneNumber = patient.PhoneNumber;
             DateOfBirth = patient.DateOfBirth;
-
+            DoctorIds = patient.DoctorIds;
         }
 
         [JsonProperty(PropertyName = "id")]
@@ -31,6 +31,9 @@ namespace DAL.Models
         [JsonProperty(PropertyName = "name")]
         public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "swasthyaId")]
+        public string SwasthyaId { get; set; }
+
         [JsonProperty(PropertyName = "password")]
         public string Password { get; set; }
 
@@ -38,6 +41,12 @@ namespace DAL.Models
         public string PhoneNumber { get; set; }
 
         [JsonProperty(PropertyName = "dateOfBirth")]
-        public string DateOfBirth{ get; set; }
+        public string DateOfBirth { get; set; }
+
+        [JsonProperty(PropertyName = "doctorIds")]
+        public List<string> DoctorIds { get; set; }
+
+        [JsonIgnore]
+        public List<IDoctor> Doctors { get; set; }
     }
 }

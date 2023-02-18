@@ -1,20 +1,19 @@
-﻿using Common.Models;
+﻿using BCrypt.Net;
+using Common.DTO;
+using Common.Models;
 using DAL.Repositories;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace BL.Operations
 {
     public class DoctorOperations
     {
-        private string token;
         DoctorRepository doctorRepository;
+        PatientRepository patientRepository;
 
-        public DoctorOperations(string token, DoctorRepository doctorRepository)
+        public DoctorOperations(DoctorRepository doctorRepository, PatientRepository patientRepository)
         {
-            this.token = token;
             this.doctorRepository = doctorRepository;
+            this.patientRepository = patientRepository;
         }
 
         public async Task<IDoctor> RegisterDoctorAsync(string email, string password, string name, string phoneNumber, string registrationNumber)
@@ -31,44 +30,85 @@ namespace BL.Operations
                 return null;
             }
 
-            var doctorResponse = await doctorRepository.RegisterDoctorAsync(email, password, name, registrationNumber, phoneNumber);
+            password = CreatePasswordHash(password);
+
+            Random random = new Random();
+            var swasthyaId = name + "_" + random.Next();
+
+            var doctorResponse = await doctorRepository.CreateDoctorAsync(email, password, name, swasthyaId, registrationNumber, phoneNumber);
             return doctorResponse;
         }
 
-        private string CreateDoctorJwtToken(IDoctor doctor)
+        public async Task<IDoctor> LoginDoctorAsync(string email, string password)
         {
-            List<Claim> claims = new()
+            var doctor = await doctorRepository.GetDoctorByEmailAsync(email);
+
+            if (doctor == null)
             {
-                new Claim(ClaimTypes.NameIdentifier, doctor.Name),
-                new Claim(ClaimTypes.Email, doctor.Email),
-                new Claim(ClaimTypes.MobilePhone, doctor.PhoneNumber),
-                new Claim(ClaimTypes.SerialNumber, doctor.RegistrationNumber)
-            };
+                return null;
+            }
 
-            var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(token));
+            if (!VerifyPasswordHash(password, doctor.Password))
+            {
+                return null;
+            }
 
-            var loginCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-
-            var jwtToken = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddDays(5),
-                signingCredentials: loginCredentials);
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-            return jwt;
-
+            return await AddPatientData(doctor);
         }
 
-        public async Task<string> LoginDoctorAsync(string email, string password)
+        public async Task<IDoctor> GetDoctorAsync(string email)
         {
-            var doctorResponse = await doctorRepository.LoginDoctorAsync(email, password);
-            if (doctorResponse != null)
+            var doctor = await doctorRepository.GetDoctorByEmailAsync(email);
+            if (doctor != null)
             {
-                return CreateDoctorJwtToken(doctorResponse);
+                return await AddPatientData(doctor); ;
             }
 
             return null;
+        }
+
+        private async Task<IDoctor> AddPatientData(IDoctor doctorResponse)
+        {
+            var doctor = new Doctor()
+            {
+                Id = doctorResponse.Id,
+                Name = doctorResponse.Name,
+                Email = doctorResponse.Email,
+                SwasthyaId = doctorResponse.SwasthyaId,
+                PhoneNumber = doctorResponse.PhoneNumber,
+                RegistrationNumber = doctorResponse.RegistrationNumber,
+                PatientIds = doctorResponse.PatientIds
+            };
+
+            if (doctor.PatientIds != null)
+            {
+                if (doctor.Patients == null)
+                {
+                    doctor.Patients = new List<IPatient>();
+                }
+
+                foreach (var patientId in doctor.PatientIds)
+                {
+                    var patient = await patientRepository.GetPatientByIdAsync(patientId);
+                    if (patient != null)
+                    {
+                        doctor.Patients.Add(patient);
+                    }
+                }
+            }
+
+            return doctor;
+        }
+
+        private string CreatePasswordHash(string password)
+        {
+            password = BCrypt.Net.BCrypt.EnhancedHashPassword(password, hashType: HashType.SHA512);
+            return password;
+        }
+
+        private bool VerifyPasswordHash(string passwordInput, string passwordOriginal)
+        {
+            return BCrypt.Net.BCrypt.EnhancedVerify(passwordInput, passwordOriginal, hashType: HashType.SHA512);
         }
     }
 }

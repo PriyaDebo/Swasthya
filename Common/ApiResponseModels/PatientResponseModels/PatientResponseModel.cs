@@ -1,14 +1,12 @@
-﻿using Common.Models;
+﻿using Common.ApiResponseModels.DoctorResponseModels;
 
-namespace Common.DTO
+namespace Common.ApiResponseModels.PatientResponseModels
 {
-    public class Patient : IPatient
+    public class PatientResponseModel
     {
         public string Id { get; set; }
 
         public string Email { get; set; }
-
-        public string Password { get; set; }
 
         public string Name { get; set; }
 
@@ -18,8 +16,6 @@ namespace Common.DTO
 
         public string DateOfBirth { get; set; }
 
-        public List<string> DoctorIds { get; set; }
-
-        public List<IDoctor> Doctors { get; set; }
+        public List<DoctorReferenceModel> Doctors { get; set; }
     }
 }
