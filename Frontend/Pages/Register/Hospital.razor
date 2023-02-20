@@ -1,0 +1,145 @@
+﻿@page "/registration/healthcare-centre"
+
+@using Common.ApiRequestModels.HospitalRequestModels;
+@using BootstrapBlazor.Components;
+@using System.Net;
+@using System.Text.RegularExpressions;
+
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Registration</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+
+        <span class="individual-registration">
+            Healthcare Centre Registration
+        </span>
+
+    </div>
+
+    <div class="form-box">
+        <EditForm Model="hospital" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-element">
+                <label for="Name">Name</label>
+                <InputText id="Name" @bind-Value="hospital.Name" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Email">Email</label>
+                <InputText id="Email" @bind-Value="hospital.Email" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Password">Password</label>
+                <InputText id="Password" @bind-Value="hospital.Password" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="PhoneNumber">Phone Number</label>
+                <InputText id="Phone Number" @bind-Value="hospital.PhoneNumber" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Address">Address</label>
+                <InputText id="Address" @bind-Value="hospital.Address" class="form-control"></InputText>
+            </div>
+
+
+            <button class="form-button" type="submit">Register</button>
+            <ValidationSummary />
+        </EditForm>
+
+        <a href='/registration' class="button"> Already have an account? Login ⟶ </a>
+    </div>
+</div>
+
+@code {
+    private RegisterHospitalRequest hospital;
+    private LoginHospitalRequest loginHospital;
+
+    private string baseUri;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hospital = new RegisterHospitalRequest();
+        loginHospital = new LoginHospitalRequest();
+        this.baseUri = Configuration["BackendUri"];
+    }
+
+    private async void HandleSubmit()
+    {
+        if (!Regex.IsMatch(hospital.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
+        {
+            errorMessage = "Invalid email format";
+            return;
+        }
+
+        if (!Regex.IsMatch(hospital.PhoneNumber, @"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"))
+        {
+            errorMessage = "Invalid phone number";
+            return;
+        }
+
+        var registerUri = this.baseUri + "/api/Hospital/register";
+
+        try
+        {
+            var httpClient = new HttpClient();
+            var response = await httpClient.PutAsJsonAsync<RegisterHospitalRequest>(registerUri, hospital);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Login();
+            }
+
+            else if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                errorMessage = "Email already exists";
+            }
+
+            else
+            {
+                errorMessage = "An error occurred while registering. Please try again.";
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while registering: {ex.Message}";
+        }
+    }
+
+    private async void Login()
+    {
+        var loginUri = this.baseUri + "/api/Hospital/login";
+
+        loginHospital.Email = hospital.Email;
+        loginHospital.Password = hospital.Password;
+
+        try
+        {
+            var httpClient = new HttpClient();
+
+            var response = await httpClient.PostAsJsonAsync<LoginHospitalRequest>(loginUri, loginHospital);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/Hospital");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while logging in: {ex.Message}";
+        }
+    }
+}
+}
