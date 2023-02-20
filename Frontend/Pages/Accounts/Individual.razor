@@ -1,8 +1,59 @@
 ﻿@page "/Individual"
 
+@using Common.ApiResponseModels.PatientResponseModels;
+@using Operations;
 
-<h3>Individual</h3>
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual</PageTitle>
+<div>
+    <img src="@GenerateQrCodeImage("Hello, world!")" alt="QR code">
+</div>
+
 
 @code {
+    private PatientResponseModel patient;
+    private string baseUri;
+    private string errorMessage;
 
+    protected override async Task OnInitializedAsync()
+    {
+        patient = new PatientResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+
+        //GetPatient();
+    }
+
+    private string GenerateQrCodeImage(string text)
+    {
+        var qrc = new QRCodeGeneration();
+        return qrc.GenerateQrCodeImage(text);
+    }
+
+    private async void GetPatient()
+    {
+        var getPatientUri = this.baseUri + "/api/Patient/getPatient";
+
+        try
+        {
+            var httpClient = new HttpClient();
+            var response = await httpClient.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
+
+            if (response != null)
+            {
+                this.patient = response;
+            }
+
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
 }

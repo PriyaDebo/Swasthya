@@ -59,6 +59,11 @@
             <ValidationSummary />
         </EditForm>
 
+        @if (showErrorMessage)
+        {
+            <MessageBox Title="Error" Icon="Error" Message="@errorMessage" @onClose="@(() => showErrorMessage = false)" />
+        }
+
         <a href='/login/individual' class="button"> Already have an account? Login ⟶ </a>
     </div>
 </div>
@@ -69,24 +74,28 @@
     private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
     private string baseUri;
     private string errorMessage;
+    private bool showErrorMessage;
 
     protected override async Task OnInitializedAsync()
     {
         patient = new RegisterPatientRequest();
         loginPatient = new LoginPatientRequest();
         this.baseUri = Configuration["BackendUri"];
+        showErrorMessage = false;
     }
 
     private async void HandleSubmit()
     {
         if (!Regex.IsMatch(patient.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
         {
+            showErrorMessage = true;
             errorMessage = "Invalid email format";
             return;
         }
 
         if (!Regex.IsMatch(patient.PhoneNumber, @"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"))
         {
+            showErrorMessage = true;
             errorMessage = "Invalid phone number";
             return;
         }
@@ -105,17 +114,20 @@
 
             else if (response.StatusCode == HttpStatusCode.Conflict)
             {
+                showErrorMessage = true;
                 errorMessage = "Email already exists";
             }
 
             else
             {
+                showErrorMessage = true;
                 errorMessage = "An error occurred while registering. Please try again.";
             }
         }
 
         catch (Exception ex)
         {
+            showErrorMessage = true;
             errorMessage = $"An error occurred while registering: {ex.Message}";
         }
     }
@@ -141,8 +153,8 @@
 
         catch (Exception ex)
         {
+            showErrorMessage = true;
             errorMessage = $"An error occurred while logging in: {ex.Message}";
         }
     }
-}
 }

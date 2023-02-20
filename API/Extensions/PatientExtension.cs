@@ -14,6 +14,7 @@ namespace API.Extensions
                 Name = patient.Name,
                 PhoneNumber = patient.PhoneNumber,
                 DateOfBirth = patient.DateOfBirth,
+                SwasthyaId = patient.SwasthyaId,
             };
 
             if (patient.Doctors == null)
