@@ -8,7 +8,7 @@
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Swasthya - Registration</PageTitle>
+<PageTitle>Swasthya - Healthcare Centre Login</PageTitle>
 
 <div class="wrapper-div">
     <div class="wrapper-div-upper">
@@ -35,6 +35,9 @@
                 <label for="Password">Password</label>
                 <InputText id="Password" @bind-Value="hospital.Password" class="form-control"></InputText>
             </div>
+
+            <button class="form-button" type="submit">Login</button>
+
             <ValidationSummary />
         </EditForm>
 

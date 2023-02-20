@@ -9,7 +9,7 @@
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Swasthya - Registration</PageTitle>
+<PageTitle>Swasthya - Medical Practitioner Login</PageTitle>
 
 <div class="wrapper-div">
     <div class="wrapper-div-upper">
@@ -17,8 +17,8 @@
             swasthya
         </h1>
 
-        <span class="individual-registration">
-            Medical Practitioner Registration
+        <span class="doctor-login">
+            Medical Practitioner Login
         </span>
 
     </div>
@@ -37,7 +37,7 @@
                 <InputText id="Password" @bind-Value="doctor.Password" class="form-control"></InputText>
             </div>
 
-            <button class="form-button" type="submit">Register</button>
+            <button class="form-button" type="submit">Login</button>
             <ValidationSummary />
         </EditForm>
 
@@ -48,7 +48,6 @@
 @code {
     private LoginDoctorRequest doctor;
 
-    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
     private string baseUri;
     private string errorMessage;
 
