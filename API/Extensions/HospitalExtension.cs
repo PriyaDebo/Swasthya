@@ -16,6 +16,11 @@ namespace API.Extensions
                 Address = hospital.Address,
             };
 
+            if (hospital.Patients == null)
+            {
+                return model;
+            }
+
             if (hospital.PatientIds != null )
             {
                 if (model.Patients == null)
