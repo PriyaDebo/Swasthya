@@ -1,5 +1,88 @@
-﻿<h3>Doctor</h3>
+﻿@page "/login/medical-practitioner"
+
+@using Common.ApiRequestModels.DoctorRequestModels;
+
+@using BootstrapBlazor.Components;
+@using System.Net;
+@using System.Text.RegularExpressions;
+
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Registration</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+
+        <span class="individual-registration">
+            Medical Practitioner Registration
+        </span>
+
+    </div>
+
+    <div class="form-box">
+        <EditForm Model="doctor" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-element">
+                <label for="Email">Email</label>
+                <InputText id="Email" @bind-Value="doctor.Email" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Password">Password</label>
+                <InputText id="Password" @bind-Value="doctor.Password" class="form-control"></InputText>
+            </div>
+
+            <button class="form-button" type="submit">Register</button>
+            <ValidationSummary />
+        </EditForm>
+
+        <a href='/registration/medical-practitioner' class="button"> Don't have an account? Register ⟶ </a>
+    </div>
+</div>
 
 @code {
+    private LoginDoctorRequest doctor;
 
+    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
+    private string baseUri;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = new LoginDoctorRequest();
+        this.baseUri = Configuration["BackendUri"];
+    }
+
+    private async void HandleSubmit()
+    {
+        if (!Regex.IsMatch(doctor.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
+        {
+            errorMessage = "Invalid email format";
+            return;
+        }
+
+        var loginUri = this.baseUri + "/api/Doctor/login";
+
+        try
+        {
+            var httpClient = new HttpClient();
+
+            var response = await httpClient.PostAsJsonAsync<LoginDoctorRequest>(loginUri, doctor);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NavigationManager.NavigateTo("/Medical-Practitioner");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while logging in: {ex.Message}";
+        }
+    }
 }
