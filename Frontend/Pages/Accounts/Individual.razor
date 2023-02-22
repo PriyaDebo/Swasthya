@@ -1,13 +1,19 @@
-﻿@page "/Individual"
+﻿@page "/Individual/{email}"
 
 @using Common.ApiResponseModels.PatientResponseModels;
+@using Common.ApiRequestModels.PatientRequestModels;
 @using Operations;
 
+@inject HttpClient http;
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
 <PageTitle>Swasthya - Individual</PageTitle>
 <div>
+    <div>
+        @patient.Email
+        @patient.SwasthyaId
+    </div>
     <img src="@GenerateQrCodeImage("Hello, world!")" alt="QR code">
 </div>
 
@@ -15,14 +21,18 @@
 @code {
     private PatientResponseModel patient;
     private string baseUri;
+    private string patientEmail;
     private string errorMessage;
+
+    [Parameter]
+    public string email { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         patient = new PatientResponseModel();
         this.baseUri = Configuration["BackendUri"];
 
-        //GetPatient();
+        await GetPatient();
     }
 
     private string GenerateQrCodeImage(string text)
@@ -31,24 +41,25 @@
         return qrc.GenerateQrCodeImage(text);
     }
 
-    private async void GetPatient()
+    private async Task GetPatient()
     {
-        var getPatientUri = this.baseUri + "/api/Patient/getPatient";
+        var uriFormat = this.baseUri + @"/api/Patient/getPatient/{0}";
+        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
 
         try
         {
-            var httpClient = new HttpClient();
-            var response = await httpClient.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
 
-            if (response != null)
-            {
-                this.patient = response;
-            }
+                var response = await http.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
 
-            else
-            {
-                errorMessage = "An error occurred. Please try again.";
-            }
+                if (response != null)
+                {
+                    this.patient = response;
+                }
+                else
+                {
+                    errorMessage = "An error occurred. Please try again.";
+                }
+
         }
 
         catch (Exception ex)

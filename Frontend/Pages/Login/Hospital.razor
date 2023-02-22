@@ -75,7 +75,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/Hospital");
+                var pageUrl = "/Hospital/" + hospital.Email;
+                NavigationManager.NavigateTo(pageUrl);
+                //NavigationManager.NavigateTo("/Hospital");
             }
         }
 

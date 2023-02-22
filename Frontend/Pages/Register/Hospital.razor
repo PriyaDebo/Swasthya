@@ -102,7 +102,7 @@
 
             else if (response.StatusCode == HttpStatusCode.Conflict)
             {
-                errorMessage = "Email already exists";
+                errorMessage = "email already exists";
             }
 
             else
@@ -132,7 +132,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/Hospital");
+                var pageUrl = "/Hospital/" + hospital.Email;
+                NavigationManager.NavigateTo(pageUrl);
+                //NavigationManager.NavigateTo("/Hospital");
             }
         }
 

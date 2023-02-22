@@ -22,7 +22,7 @@ namespace API.Controllers
         //Hospital
         [HttpPut]
         [Route("addReportByHospital")]
-        [Authorize(Constants.HospitalPolicy)]
+        //[Authorize(Constants.HospitalPolicy)]
         public async Task<ActionResult<ReportResponseModel>> AddReportByHospitalAsync(AddReportByHospitalRequest request)
         {
             if(!ModelState.IsValid)
@@ -42,7 +42,7 @@ namespace API.Controllers
         //Doctor
         [HttpGet]
         [Route("getReportsByEmailForDoctor")]
-        [Authorize(Constants.DoctorPolicy)]
+        //[Authorize(Constants.DoctorPolicy)]
         public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailForDoctorAsync(GetReportByEmailRequest request)
         {
             if (!ModelState.IsValid)
@@ -56,7 +56,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("getReportByBlobNameForDoctor")]
-        [Authorize(Constants.DoctorPolicy)]
+        //[Authorize(Constants.DoctorPolicy)]
         public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForDoctorAsync(GetReportByBlobNameRequest request)
         {
             if (!ModelState.IsValid)
@@ -71,7 +71,7 @@ namespace API.Controllers
         //Patient
         [HttpPut]
         [Route("addReportByPatient")]
-        [Authorize(Constants.PatientPolicy)]
+        //[Authorize(Constants.PatientPolicy)]
         public async Task<ActionResult<ReportResponseModel>> AddReportByPatientAsync(AddReportByPatientRequest request)
         {
             if (!ModelState.IsValid)
@@ -79,7 +79,8 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            var report = await reportOperations.AddReportAsync(User.FindFirstValue(ClaimTypes.Email), request.title, request.report);
+            //var report = await reportOperations.AddReportAsync(User.FindFirstValue(ClaimTypes.email), request.title, request.report);
+            var report = await reportOperations.AddReportAsync(request.email, request.title, request.report);
             if (report == null)
             {
                 return BadRequest("Failed to add report.");
@@ -90,16 +91,17 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("getReportsByEmailForPatient")]
-        [Authorize(Constants.PatientPolicy)]
-        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailForPatientAsync()
+        //[Authorize(Constants.PatientPolicy)]
+        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailForPatientAsync(GetReportByEmailRequest request)
         {
-           var reports = await reportOperations.GetReportsByEmailAsync(User.FindFirstValue(ClaimTypes.Email));
+            //var reports = await reportOperations.GetReportsByEmailAsync(User.FindFirstValue(ClaimTypes.email));
+            var reports = await reportOperations.GetReportsByEmailAsync(request.email);
             return Ok(reports.NamesToAPIModel());
         }
 
         [HttpGet]
         [Route("getReportByBlobNameForPatient")]
-        [Authorize(Constants.PatientPolicy)]
+        //[Authorize(Constants.PatientPolicy)]
         public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForPatientAsync(GetReportByBlobNameRequest request)
         {
             if(!ModelState.IsValid)

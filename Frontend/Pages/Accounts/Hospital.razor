@@ -1,7 +1,53 @@
-﻿@page "/Hospital"
+﻿@page "/Hospital/{email}"
+
+@using Common.ApiResponseModels.HospitalResponseModels;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
 
 <h3>Hospital</h3>
 
 @code {
+    private HospitalResponseModel hospital;
+    private string baseUri;
+    private string errorMessage;
 
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hospital = new HospitalResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+
+        await GetHospital();
+    }
+
+    private async Task GetHospital()
+    {
+        var uriFormat = this.baseUri + @"/api/Hospital/getHospital/{0}";
+        var getHospitalUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<HospitalResponseModel>(getHospitalUri);
+
+            if (response != null)
+            {
+                this.hospital = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
 }

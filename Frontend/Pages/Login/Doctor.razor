@@ -75,7 +75,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/Medical-Practitioner");
+                var pageUrl = "/Medical-Practitioner/" + doctor.Email;
+                NavigationManager.NavigateTo(pageUrl);
+                //NavigationManager.NavigateTo("/Medical-Practitioner");
             }
         }
 

@@ -1,7 +1,53 @@
-﻿@page "/Medical-Practitioner"
+﻿@page "/Medical-Practitioner/{email}"
+
+@using Common.ApiResponseModels.DoctorResponseModels;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
 
 <h3>Doctor</h3>
 
 @code {
+    private DoctorResponseModel doctor;
+    private string baseUri;
+    private string errorMessage;
 
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = new DoctorResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+
+        await GetDoctor();
+    }
+
+    private async Task GetDoctor()
+    {
+        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
+        var getDoctorUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getDoctorUri);
+
+            if (response != null)
+            {
+                this.doctor = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
 }

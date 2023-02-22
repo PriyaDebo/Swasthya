@@ -36,7 +36,7 @@ namespace API.Controllers
 
             if (hospital == null)
             {
-                return BadRequest("Email already registered.");
+                return BadRequest("email already registered.");
             }
 
             return Ok(hospital.ToAPIModel());
@@ -79,14 +79,17 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("getHospital")]
-        public async Task<ActionResult<HospitalResponseModel>> GetHospitalAsync()
+        [AllowAnonymous]
+        [Route("getHospital/{email}")]
+        public async Task<ActionResult<HospitalResponseModel>> GetHospitalAsync(string email)
         {
-            var hospital = await hospitalOperations.GetHospitalAsync(User.FindFirstValue(ClaimTypes.Email));
+            //var hospital = await hospitalOperations.GetHospitalAsync(User.FindFirstValue(ClaimTypes.email));
+            var hospital = await hospitalOperations.GetHospitalAsync(email);
             return Ok(hospital.ToAPIModel());
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("addPatientPermit")]
         public async Task<ActionResult> AddPatientPermitAsync(GetPatientPermitRequest request)
         {
@@ -95,7 +98,8 @@ namespace API.Controllers
                 return BadRequest();
             }
 
-            var response = await hospitalOperations.AddPermittedPatientAsync(User.FindFirstValue(ClaimTypes.Email), request.PatientSwasthyaId);
+            //var response = await hospitalOperations.AddPermittedPatientAsync(User.FindFirstValue(ClaimTypes.email), request.patientSwasthyaId);
+            var response = await hospitalOperations.AddPermittedPatientAsync(request.email, request.patientSwasthyaId);
             if (response)
             {
                 return Ok(response);
