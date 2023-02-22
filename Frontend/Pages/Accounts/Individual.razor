@@ -9,62 +9,43 @@
 @inject NavigationManager NavigationManager;
 
 <PageTitle>Swasthya - Individual</PageTitle>
-<div>
-    <div>
-        @patient.Email
-        @patient.SwasthyaId
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
     </div>
-    <img src="@GenerateQrCodeImage("Hello, world!")" alt="QR code">
+    <span class="instruction-text">
+        Select one.
+    </span>
+    <div class="wrapper-div-middle">
+        <button class="button-image" @onclick="() => NavigateToProfile()">
+            <img class="images" src="./images/Profile.svg" />
+        </button>
+        <button class="button-image" @onclick="() => NavigateToDoctors()">
+            <img class="images" src="./images/Medical Practitioners.svg" />
+        </button>
+        <button class="button-image" onclick="GenerateQrCodeImage">
+            <img class="images" src="./images/Reports.svg" />
+        </button>
+    </div>
 </div>
 
-
 @code {
-    private PatientResponseModel patient;
-    private string baseUri;
-    private string patientEmail;
-    private string errorMessage;
 
     [Parameter]
     public string email { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private void NavigateToProfile()
     {
-        patient = new PatientResponseModel();
-        this.baseUri = Configuration["BackendUri"];
-
-        await GetPatient();
+        var pageUrl = "/Individual/Profile/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 
-    private string GenerateQrCodeImage(string text)
+    private void NavigateToDoctors()
     {
-        var qrc = new QRCodeGeneration();
-        return qrc.GenerateQrCodeImage(text);
-    }
-
-    private async Task GetPatient()
-    {
-        var uriFormat = this.baseUri + @"/api/Patient/getPatient/{0}";
-        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
-
-        try
-        {
-
-                var response = await http.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
-
-                if (response != null)
-                {
-                    this.patient = response;
-                }
-                else
-                {
-                    errorMessage = "An error occurred. Please try again.";
-                }
-
-        }
-
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred : {ex.Message}";
-        }
+        var pageUrl = "/Individual/Medical-Practitioners/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 }

@@ -100,6 +100,16 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Route("getReportsByEmail/{email}")]
+        //[Authorize(Constants.PatientPolicy)]
+        public async Task<ActionResult<IEnumerable<ReportResponseModel>>> GetReportsByEmailAsync(string email)
+        {
+            //var reports = await reportOperations.GetReportsByEmailAsync(User.FindFirstValue(ClaimTypes.email));
+            var reports = await reportOperations.GetReportsByEmailAsync(email);
+            return Ok(reports.NamesToAPIModel());
+        }
+
+        [HttpGet]
         [Route("getReportByBlobNameForPatient")]
         //[Authorize(Constants.PatientPolicy)]
         public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForPatientAsync(GetReportByBlobNameRequest request)

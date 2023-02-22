@@ -1,0 +1,58 @@
+﻿@page "/Reports/{email}"
+
+@using Common.ApiRequestModels.ReportRequestModels;
+@using Common.ApiResponseModels.ReportResponseModels;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual Login</PageTitle>
+
+<div>
+
+</div>
+
+
+@code {
+    private ReportResponseModel reports;
+    private string baseUri;
+    private string errorMessage;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        reports = new ReportResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+        await GetReports();
+    }
+
+    private async Task GetReports()
+    {
+        var uriFormat = this.baseUri + @"/api/Reports/getReportsByEmail/{0}";
+        var getReportUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<ReportResponseModel>(getReportUri);
+
+            if (response != null)
+            {
+                this.reports = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+}
