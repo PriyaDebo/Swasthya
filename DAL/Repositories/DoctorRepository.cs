@@ -113,7 +113,7 @@ namespace DAL.Repositories
         public async Task<IDoctor?> GetDoctorIdBySwasthyaIdAsync(string swasthyaId)
         {
             var query = $"SELECT * FROM Doctor WHERE Doctor.swasthyaId = @swasthyaId";
-            var queryDefinition = new QueryDefinition(query).WithParameter("@email", swasthyaId);
+            var queryDefinition = new QueryDefinition(query).WithParameter("@swasthyaId", swasthyaId);
             var doctorResponse = container.GetItemQueryIterator<DoctorData>(queryDefinition);
             var response = await doctorResponse.ReadNextAsync();
             var responseResource = response.Resource.FirstOrDefault();

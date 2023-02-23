@@ -2,6 +2,7 @@
 
 @using Common.ApiResponseModels.PatientResponseModels;
 @using Common.ApiRequestModels.PatientRequestModels;
+@using BootstrapBlazor.Components;
 
 @inject HttpClient http;
 @inject IConfiguration Configuration;
@@ -15,29 +16,45 @@
             swasthya
         </h1>
     </div>
-    <div class="profile-details">
-        Doctors
+
+    <div class="wrapper-div-middle">
+        <div class="form-box">
+            <EditForm Model="addDoctor" OnValidSubmit="AddDoctor">
+                <DataAnnotationsValidator />
+                <div class="form-element">
+                    <label for="DoctorSwasthyaId">Doctor Swasthya Id</label>
+                    <InputText id="DoctorSwasthyaId" @bind-Value="addDoctor.doctorSwasthyaId" class="form-control"></InputText>
+                </div>
+                <button class="form-button" type="submit">Add Doctor</button>
+                <ValidationSummary />
+            </EditForm>
+        </div>
+        <div class="patients">
+            Doctors
+        </div>
+
+        @if (patient.Doctors != null)
+        {
+            foreach (var doctor in patient.Doctors)
+            {
+                <Card class="doctor-details">
+                    <BodyTemplate>
+                        <p class="card-text">
+                            Name: @doctor.Name <br>
+                            Email: @doctor.Email <br>
+                            Phone Number: @doctor.PhoneNumber <br>
+                            SwasthyaId: @doctor.SwasthyaId <br>
+                        </p>
+                    </BodyTemplate>
+                </Card>
+            }
+        }
     </div>
 </div>
 
-@if (patient.Doctors == null)
-{
-    <div>
-        No Doctors Authorized
-    </div>
-}
-else
-{
-    foreach (var doctor in patient.Doctors)
-    {
-        <div>
-            @doctor.Name
-        </div>
-    }
-}
-
 @code {
     private PatientResponseModel patient;
+    private PermitDoctorRequest addDoctor;
     private string baseUri;
     private string patientEmail;
     private string errorMessage;
@@ -48,6 +65,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         patient = new PatientResponseModel();
+        addDoctor = new PermitDoctorRequest();
         this.baseUri = Configuration["BackendUri"];
         await GetPatient();
     }
@@ -77,5 +95,32 @@ else
         {
             errorMessage = $"An error occurred : {ex.Message}";
         }
+    }
+
+    private async Task AddDoctor()
+    {
+        addDoctor.email = email;
+        var uriFormat = this.baseUri + "/api/Patient/permitDoctor";
+        try
+        {
+            var response = await http.PostAsJsonAsync<PermitDoctorRequest>(uriFormat, addDoctor);
+
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+
+        StateHasChanged();
     }
 }

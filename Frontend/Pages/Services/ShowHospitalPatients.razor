@@ -139,6 +139,8 @@
         {
             errorMessage = $"An error occurred : {ex.Message}";
         }
+
+        StateHasChanged();
     }
 
     private IBrowserFile file;
