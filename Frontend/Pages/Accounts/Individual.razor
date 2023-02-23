@@ -26,7 +26,7 @@
         <button class="button-image" @onclick="() => NavigateToDoctors()">
             <img class="images" src="./images/Medical Practitioners.svg" />
         </button>
-        <button class="button-image" onclick="GenerateQrCodeImage">
+        <button class="button-image" @onclick="() => NavigateToReports()">
             <img class="images" src="./images/Reports.svg" />
         </button>
     </div>
@@ -46,6 +46,12 @@
     private void NavigateToDoctors()
     {
         var pageUrl = "/Individual/Medical-Practitioners/" + email;
+        NavigationManager.NavigateTo(pageUrl);
+    }
+
+    private void NavigateToReports()
+    {
+        var pageUrl = "/Reports/" + email;
         NavigationManager.NavigateTo(pageUrl);
     }
 }

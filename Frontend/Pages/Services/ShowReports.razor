@@ -7,7 +7,7 @@
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
-<PageTitle>Swasthya - Individual Login</PageTitle>
+<PageTitle>Swasthya - Reports</PageTitle>
 
 <div>
 
@@ -54,5 +54,10 @@
         {
             errorMessage = $"An error occurred : {ex.Message}";
         }
+    }
+
+    private async Task AddReports()
+    {
+
     }
 }

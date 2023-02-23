@@ -55,9 +55,14 @@
     {
         patient = new PatientResponseModel();
         this.baseUri = Configuration["BackendUri"];
+        Console.WriteLine("Get Patient");
+        Console.WriteLine(DateTime.UtcNow);
         await GetPatient();
+        Console.WriteLine(DateTime.UtcNow);
+        Console.WriteLine("Get QRCode");
         qrCodeGeneration = new QRCodeGeneration();
         QRCode = await GenerateQrCodeImage();
+        Console.WriteLine(DateTime.UtcNow);
     }
 
     private async Task<string> GenerateQrCodeImage()

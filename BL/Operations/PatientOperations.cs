@@ -54,7 +54,9 @@ namespace BL.Operations
 
         public async Task<IPatient> GetPatientAsync(string email)
         {
+            Console.WriteLine(DateTime.UtcNow);
             var patient =  await patientRepository.GetPatientByEmailAsync(email);
+            Console.WriteLine(DateTime.UtcNow);
             return await AddDoctorData(patient);
         }
 
@@ -107,7 +109,7 @@ namespace BL.Operations
                     }
                 }
             }
-
+            Console.WriteLine(DateTime.UtcNow);
             return patient;
         }
 

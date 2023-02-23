@@ -92,9 +92,14 @@ namespace API.Controllers
         [Route("getPatient/{email}")]
         public async Task<ActionResult<PatientResponseModel>> GetPatientAsync(string email)
         {
+            Console.WriteLine("Start");
+            Console.WriteLine(DateTime.UtcNow);
             //var patient = await patientOperations.GetPatientAsync(User.FindFirstValue(ClaimTypes.email));
             var patient = await patientOperations.GetPatientAsync(email);
-            return Ok(patient.ToAPIModel());
+            var response = Ok(patient.ToAPIModel());
+            Console.WriteLine(DateTime.UtcNow);
+            Console.WriteLine("End");
+            return response;
         }
 
         [HttpPost]

@@ -6,48 +6,45 @@
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
-<h3>Doctor</h3>
+<PageTitle>Swasthya - Individual</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <span class="instruction-text">
+        Select one.
+    </span>
+    <div class="wrapper-div-middle">
+        <button class="button-image" @onclick="() => NavigateToProfile()">
+            <img class="images" src="./images/Doctor Profile.svg" />
+        </button>
+        <button class="button-image" @onclick="() => NavigateToPatients()">
+            <img class="images" src="./images/Patients.svg" />
+        </button>
+    </div>
+</div>
+
+
 
 @code {
-    private DoctorResponseModel doctor;
     private string baseUri;
     private string errorMessage;
 
     [Parameter]
     public string email { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private void NavigateToProfile()
     {
-        doctor = new DoctorResponseModel();
-        this.baseUri = Configuration["BackendUri"];
-
-        await GetDoctor();
+        var pageUrl = "/Medical-Practitioners/Profile/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 
-    private async Task GetDoctor()
+    private void NavigateToPatients()
     {
-        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
-        var getDoctorUri = string.Format(uriFormat, Uri.EscapeDataString(email));
-
-        try
-        {
-
-            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getDoctorUri);
-
-            if (response != null)
-            {
-                this.doctor = response;
-            }
-            else
-            {
-                errorMessage = "An error occurred. Please try again.";
-            }
-
-        }
-
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred : {ex.Message}";
-        }
+        var pageUrl = "/Medical-Practitioners/Patients/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 }

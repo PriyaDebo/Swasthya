@@ -1,0 +1,48 @@
+﻿@page "/Medical-Practitioners/Profile/{email}"
+
+@inject NavigationManager NavigationManager;
+
+@*@using Common.ApiResponseModels.PatientResponseModels;
+@using Common.ApiRequestModels.PatientRequestModels;
+@using Operations;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="profile-details">
+        Profile Details
+    </div>
+    <div class="profile-box">
+        <div class="data">
+            Name: @patient.Name
+        </div>
+        <div class="data">
+            Phone Number: @patient.PhoneNumber
+        </div>
+        <div class="data">
+            Email: @patient.Email
+        </div>
+        <div class="data">
+            Swasthya ID: @patient.SwasthyaId
+        </div>
+        @if (patient != null)
+        {
+            <img class="qr-code" src="@QRCode" alt="@patient.SwasthyaId">
+        }
+    </div>
+</div>
+*@
+
+@code {
+    [Parameter]
+    public string email { get; set; }
+}

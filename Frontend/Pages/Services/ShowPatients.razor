@@ -1,7 +1,7 @@
-﻿@page "/Individual/Medical-Practitioners/{email}"
+﻿@page "/Medical-Practitioners/Patients/{email}"
 
-@using Common.ApiResponseModels.PatientResponseModels;
-@using Common.ApiRequestModels.PatientRequestModels;
+@using Common.ApiResponseModels.DoctorResponseModels;
+@using Common.ApiRequestModels.DoctorRequestModels;
 
 @inject HttpClient http;
 @inject IConfiguration Configuration;
@@ -16,28 +16,14 @@
         </h1>
     </div>
     <div class="profile-details">
-        Doctors
+        Patients
     </div>
 </div>
 
-@if (patient.Doctors == null)
-{
-    <div>
-        No Doctors Authorized
-    </div>
-}
-else
-{
-    foreach (var doctor in patient.Doctors)
-    {
-        <div>
-            @doctor.Name
-        </div>
-    }
-}
+
 
 @code {
-    private PatientResponseModel patient;
+    private DoctorResponseModel doctor;
     private string baseUri;
     private string patientEmail;
     private string errorMessage;
@@ -47,24 +33,24 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        patient = new PatientResponseModel();
+        doctor = new DoctorResponseModel();
         this.baseUri = Configuration["BackendUri"];
         await GetPatient();
     }
 
     private async Task GetPatient()
     {
-        var uriFormat = this.baseUri + @"/api/Patient/getPatient/{0}";
-        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
+        var getDoctorUri = string.Format(uriFormat, Uri.EscapeDataString(email));
 
         try
         {
 
-            var response = await http.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
+            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getDoctorUri);
 
             if (response != null)
             {
-                this.patient = response;
+                this.doctor = response;
             }
             else
             {
