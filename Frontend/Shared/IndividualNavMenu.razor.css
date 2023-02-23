@@ -1,0 +1,38 @@
+﻿.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #17224D;
+    color: #FFFFFF;
+    height: 4vh;
+    padding-left: 1vw;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: Samarkan;
+}
+
+.navbar-nav {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0 10px;
+}
+
+.nav-link {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+    .nav-link:hover {
+        color: #f00;
+    }
+

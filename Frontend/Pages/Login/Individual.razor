@@ -5,6 +5,7 @@
 @using System.Net;
 @using System.Text.RegularExpressions;
 
+@inject HttpClient http;
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
@@ -67,13 +68,15 @@
 
         try
         {
-            var httpClient = new HttpClient();
-
-            var response = await httpClient.PostAsJsonAsync<LoginPatientRequest>(loginUri, patient);
+            var requestMessage = new HttpRequestMessage();
+            requestMessage.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+            var response = await http.PostAsJsonAsync<LoginPatientRequest>(loginUri, patient);
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/Individual");
+                var pageUrl = "/Individual/" + patient.Email;
+                //NavigationManager.NavigateTo("/Individual");
+                NavigationManager.NavigateTo(pageUrl);
             }
         }
 

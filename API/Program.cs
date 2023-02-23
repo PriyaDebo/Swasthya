@@ -5,6 +5,7 @@ using DAL.Repositories;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Azure;
 using Azure.Storage.Blobs;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 var primaryKey = builder.Configuration["CosmosDbPrimaryKey"];
@@ -22,6 +23,9 @@ builder.Services.AddAuthentication()
         options.SlidingExpiration = true;
         options.LoginPath = "/api/patient/login";
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.IsEssential = true;
+        options.Cookie.Domain = "localhost";
     })
     .AddCookie(Constants.DoctorCookie, options =>
     {
@@ -34,6 +38,7 @@ builder.Services.AddAuthentication()
         options.SlidingExpiration = true;
         options.LoginPath = "/api/doctor/login";
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
+        options.Cookie.SameSite = SameSiteMode.None;
     })
     .AddCookie(Constants.HospitalCookie, options =>
     {
@@ -46,6 +51,7 @@ builder.Services.AddAuthentication()
         options.SlidingExpiration = true;
         options.LoginPath = "/api/hospial/login";
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
+        options.Cookie.SameSite = SameSiteMode.None;
     });
 
 
@@ -96,7 +102,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors(builder =>
 {
-    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+    builder.AllowAnyMethod().AllowAnyHeader().AllowCredentials().SetIsOriginAllowed(origin => true);
 });
 
 app.UseHttpsRedirection();

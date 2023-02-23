@@ -1,0 +1,192 @@
+﻿@page "/Hospital/Patients/{email}"
+
+@using BootstrapBlazor.Components;
+@using Common.ApiResponseModels.HospitalResponseModels;
+@using Common.ApiRequestModels.HospitalRequestModels;
+@using Common.ApiRequestModels.ReportRequestModels;
+@using Common.ApiResponseModels.ReportResponseModels;
+@using System.Text;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual Login</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="patients">
+        Add Patients
+    </div>
+
+    <div class="wrapper-div-middle">
+        <div class="form-box">
+        <EditForm Model="addPatient" OnValidSubmit="AddPatient">
+            <DataAnnotationsValidator />
+            <div class="form-element">
+                <label for="PatientSwasthyaId">Patient Swasthya Id</label>
+                <InputText id="PatientSwasthyaId" @bind-Value="addPatient.patientSwasthyaId" class="form-control"></InputText>
+            </div>
+            <button class="form-button" type="submit">Add Patient</button>
+            <ValidationSummary />
+        </EditForm>
+        </div>
+        <div class="patients">
+            Patients
+        </div>
+        @if(hospital.Patients != null)
+        {
+            <div class="patient-details">
+                @foreach (var patient in hospital.Patients)
+                {
+                    <Card class="patient-details">
+                        <BodyTemplate>
+                            <p class="card-text">
+                                Name: @patient.Name <br>
+                                Email: @patient.Email <br>
+                                Phone Number: @patient.PhoneNumber <br>
+                                Swasthya Id: @patient.SwasthyaId <br>
+                            </p>
+                            <InputFile class="add-report" OnChange="HandleFileSelected" accept=".pdf"/>
+
+                        </BodyTemplate>
+                        <FooterTemplate>
+                            <button class="add-report" @onclick="() => AddReport(patient.Email)">
+                                Add Report
+                            </button>
+                        </FooterTemplate>
+                    </Card>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+
+
+@code {
+    private HospitalResponseModel hospital;
+    private string baseUri;
+    private string patientEmail;
+    private string errorMessage;
+
+    private GetPatientPermitRequest addPatient;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hospital = new HospitalResponseModel();
+        addPatient = new GetPatientPermitRequest();
+        this.baseUri = Configuration["BackendUri"];
+        await GetHospital();
+    }
+
+    private async Task GetHospital()
+    {
+        var uriFormat = this.baseUri + @"/api/Hospital/getHospital/{0}";
+        var getHospitalUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<HospitalResponseModel>(getHospitalUri);
+
+            if (response != null)
+            {
+                this.hospital = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+
+    private async Task AddPatient()
+    {
+        var addPatientUri = this.baseUri + "/api/Hospital/addPatientPermit";
+        addPatient.email = email;
+
+        try
+        {
+
+            var response = await http.PostAsJsonAsync<GetPatientPermitRequest>(addPatientUri, addPatient);
+
+            if (response.IsSuccessStatusCode)
+            {
+                StateHasChanged();
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+
+        StateHasChanged();
+    }
+
+    private IBrowserFile file;
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        file = e.File;
+    }
+
+    private async Task AddReport(string patientEmail)
+    {
+        var addReportRequest = new AddReportByPatientRequest();
+        var ms = new MemoryStream();
+        await file.OpenReadStream().CopyToAsync(ms);
+        addReportRequest.email = patientEmail;
+        addReportRequest.title = file.Name;
+        //addReportRequest.report = ConvertStreamToString(ms);
+        addReportRequest.report = Encoding.ASCII.GetString(ms.ToArray());
+
+        var addReportUri = this.baseUri + "/api/Report/addReportByPatient";
+        try
+        {
+            var response = await http.PutAsJsonAsync<AddReportByPatientRequest>(addReportUri, addReportRequest);
+
+            if (response != null)
+            {
+                StateHasChanged();
+            }
+
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+
+    private static string ConvertStreamToString(Stream stream)
+    {
+        using (var reader = new StreamReader(stream, Encoding.UTF8))
+        {
+            return reader.ReadToEnd();
+        }
+    }
+}

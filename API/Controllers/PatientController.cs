@@ -45,7 +45,7 @@ namespace API.Controllers
 
             if (patient == null)
             {
-                return Conflict("Email Already Exists");
+                return Conflict("email Already Exists");
             }
 
             return Ok(patient.ToAPIModel());
@@ -81,25 +81,34 @@ namespace API.Controllers
                 {
                     IsPersistent = true,
                     AllowRefresh = true,
-                    ExpiresUtc = DateTime.UtcNow.AddDays(5)
+                    ExpiresUtc = DateTime.UtcNow.AddDays(5),
                 });
 
             return Ok();
         }
 
         [HttpGet]
-        [Route("getPatient")]
-        public async Task<ActionResult<PatientResponseModel>> GetPatientAsync()
+        [AllowAnonymous]
+        [Route("getPatient/{email}")]
+        public async Task<ActionResult<PatientResponseModel>> GetPatientAsync(string email)
         {
-            var patient = await patientOperations.GetPatientAsync(User.FindFirstValue(ClaimTypes.Email));
-            return Ok(patient.ToAPIModel());
+            Console.WriteLine("Start");
+            Console.WriteLine(DateTime.UtcNow);
+            //var patient = await patientOperations.GetPatientAsync(User.FindFirstValue(ClaimTypes.email));
+            var patient = await patientOperations.GetPatientAsync(email);
+            var response = Ok(patient.ToAPIModel());
+            Console.WriteLine(DateTime.UtcNow);
+            Console.WriteLine("End");
+            return response;
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("permitDoctor")]
         public async Task <ActionResult> AddPermittedDoctorIdAsync(PermitDoctorRequest request)
         {
-            var response = await patientOperations.AddPermittedDoctorIdAsync(User.FindFirstValue(ClaimTypes.Email), request.doctorSwasthyaId);
+            //var response = await patientOperations.AddPermittedDoctorIdAsync(User.FindFirstValue(ClaimTypes.email), request.doctorSwasthyaId);
+            var response = await patientOperations.AddPermittedDoctorIdAsync(request.email, request.doctorSwasthyaId);
             if (response)
             {
                 return Ok(response);

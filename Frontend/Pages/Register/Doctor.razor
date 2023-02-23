@@ -104,7 +104,7 @@
 
             else if (response.StatusCode == HttpStatusCode.Conflict)
             {
-                errorMessage = "Email already exists";
+                errorMessage = "email already exists";
             }
 
             else
@@ -134,7 +134,9 @@
 
             if (response.IsSuccessStatusCode)
             {
-                NavigationManager.NavigateTo("/Medical-Practitioner");
+                var pageUrl = "/Medical-Practitioner/" + doctor.Email;
+                NavigationManager.NavigateTo(pageUrl);
+                //NavigationManager.NavigateTo("/Medical-Practitioner");
             }
         }
 

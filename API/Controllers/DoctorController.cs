@@ -81,10 +81,12 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("getDoctor")]
-        public async Task<ActionResult<PatientResponseModel>> GetPatientAsync()
+        [AllowAnonymous]
+        [Route("getDoctor/{email}")]
+        public async Task<ActionResult<PatientResponseModel>> GetDoctorAsync(string email)
         {
-            var doctor = await doctorOperations.GetDoctorAsync(User.FindFirstValue(ClaimTypes.Email));
+            //var doctor = await doctorOperations.GetDoctorAsync(User.FindFirstValue(ClaimTypes.email));
+            var doctor = await doctorOperations.GetDoctorAsync(email);
             return Ok(doctor.ToAPIModel());
         }
     }

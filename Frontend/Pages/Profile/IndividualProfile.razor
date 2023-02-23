@@ -1,0 +1,95 @@
+﻿@page "/Individual/Profile/{email}"
+
+@using Common.ApiResponseModels.PatientResponseModels;
+@using Common.ApiRequestModels.PatientRequestModels;
+@using Operations;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="profile-details">
+        Profile Details
+    </div>
+    <div class="profile-box">
+        <div class="data">
+            Name: @patient.Name
+        </div>
+        <div class="data">
+            Phone Number: @patient.PhoneNumber
+        </div>
+        <div class="data">
+            Email: @patient.Email
+        </div>
+        <div class="data">
+            Swasthya ID: @patient.SwasthyaId
+        </div>
+        @if (patient != null)
+        {
+            <img class="qr-code" src="@QRCode" alt="@patient.SwasthyaId">
+        }
+    </div>
+</div>
+
+
+@code {
+    private PatientResponseModel patient;
+    private string baseUri;
+    private string patientEmail;
+    private string errorMessage;
+    private string QRCode;
+    private QRCodeGeneration qrCodeGeneration;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        patient = new PatientResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+        await GetPatient();
+    }
+
+    private async Task<string> GenerateQrCodeImage()
+    {
+        qrCodeGeneration = new QRCodeGeneration();
+        var text = patient.SwasthyaId;
+        return qrCodeGeneration.GenerateQrCodeImage(text);
+    }
+
+    private async Task GetPatient()
+    {
+        var uriFormat = this.baseUri + @"/api/Patient/getPatient/{0}";
+        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<PatientResponseModel>(getPatientUri);
+
+            if (response != null)
+            {
+                this.patient = response;
+                QRCode = await GenerateQrCodeImage();
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+}

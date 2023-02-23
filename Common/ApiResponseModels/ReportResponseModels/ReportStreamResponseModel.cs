@@ -2,6 +2,6 @@
 {
     public class ReportStreamResponseModel
     {
-        public Stream Report { get; set; }
+        public string Report { get; set; }
     }
 }

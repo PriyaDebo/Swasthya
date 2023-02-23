@@ -1,0 +1,41 @@
+﻿@*@page "/qr-scanner"
+@using ZXingBlazor
+@inject IJSRuntime jsRuntime
+
+<div>
+    <video id="video"></video>
+    <canvas id="canvas" style="display: none;"></canvas>
+    <button @onclick="StartScanning">Start Scanning</button>
+    <div>@result</div>
+</div>
+
+@code {
+    private VideoElement videoElement;
+    private CanvasElement canvasElement;
+    private ZXingScanner scanner;
+    private string result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        videoElement = await jsRuntime.InvokeAsync<VideoElement>("createVideoElement");
+        canvasElement = await jsRuntime.InvokeAsync<CanvasElement>("createCanvasElement");
+        scanner = new ZXingScanner(jsRuntime, videoElement, canvasElement);
+    }
+
+    private async Task StartScanning()
+    {
+        try
+        {
+            await scanner.StartScanning(result =>
+            {
+                this.result = result.Text;
+                StateHasChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
+*@

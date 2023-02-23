@@ -1,5 +1,7 @@
 ﻿using Common.ApiResponseModels.ReportResponseModels;
 using Common.Models;
+using System.IO;
+using System.Text;
 
 namespace API.Extensions
 {
@@ -29,7 +31,7 @@ namespace API.Extensions
                 {
                     var model = new ReportResponseModel
                     {
-                        Id = report.Id,
+                        MedicalReport = report.MedicalReport,
                         Title = report.Title,
                     };
 
@@ -42,9 +44,14 @@ namespace API.Extensions
 
         public static ReportStreamResponseModel ReportStreamToAPIModel(this Stream report)
         {
+            report.Position = 0;
+            var memoryStream = new MemoryStream();
+            memoryStream.Position = 0;
+            report.CopyTo(memoryStream);
             var model = new ReportStreamResponseModel
             {
-                Report = report
+
+                Report = Encoding.ASCII.GetString(memoryStream.ToArray())
             };
 
             return model;
