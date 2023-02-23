@@ -1,21 +1,59 @@
 ﻿@page "/Reports/{email}"
 
+@using BootstrapBlazor.Components;
 @using Common.ApiRequestModels.ReportRequestModels;
 @using Common.ApiResponseModels.ReportResponseModels;
+@using System.Net.Http.Headers;
+@using System.Net;
+@using System.Text;
+@using Microsoft.AspNetCore.Components.WebAssembly;
 
+
+@inject IJSRuntime JSRuntime
 @inject HttpClient http;
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
 <PageTitle>Swasthya - Reports</PageTitle>
 
-<div>
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="reports">
+        Reports
+    </div>
 
+    <div class="wrapper-div-middle">
+        @if(reports != null)
+        {
+            <div class="report-details ">
+                @foreach (var report in reports)
+                {
+                    <Card class="report-details ">
+                        <BodyTemplate>
+                            <p class="card-text">
+                                Name: @report.Title <br>
+                            </p>
+
+                        </BodyTemplate>
+                        <FooterTemplate>
+                            <button class="add-report" @onclick="() => DownloadReport(report.Title, report.MedicalReport)">
+                                Download
+                            </button>
+                        </FooterTemplate>
+                    </Card>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 
 @code {
-    private ReportResponseModel reports;
+    private IEnumerable<ReportResponseModel> reports;
     private string baseUri;
     private string errorMessage;
 
@@ -24,20 +62,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        reports = new ReportResponseModel();
+        reports = new List<ReportResponseModel>();
         this.baseUri = Configuration["BackendUri"];
         await GetReports();
     }
 
     private async Task GetReports()
     {
-        var uriFormat = this.baseUri + @"/api/Reports/getReportsByEmail/{0}";
+        var uriFormat = this.baseUri + @"/api/Report/getReportsByEmail/{0}";
         var getReportUri = string.Format(uriFormat, Uri.EscapeDataString(email));
 
         try
         {
 
-            var response = await http.GetFromJsonAsync<ReportResponseModel>(getReportUri);
+            var response = await http.GetFromJsonAsync<IEnumerable<ReportResponseModel>>(getReportUri);
 
             if (response != null)
             {
@@ -56,8 +94,39 @@
         }
     }
 
-    private async Task AddReports()
+    private async Task DownloadReport(string title, string blobName)
     {
 
+        var uriFormat = this.baseUri + @"/api/Report/getReportByBlobNameForPatient/{0}";
+        var getReportUri = string.Format(uriFormat, Uri.EscapeDataString(blobName));
+
+        try
+        {
+            var response = await http.GetFromJsonAsync<ReportStreamResponseModel>(getReportUri);
+            if (response != null)
+            {
+                byte[] byteArray = Encoding.UTF8.GetBytes(response.Report);
+                using var stream = new MemoryStream(byteArray);
+                await DownloadPdf(stream, title);
+            }
+
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+
+    private async Task DownloadPdf(Stream stream, string fileName)
+    {
+        byte[] bytes = new byte[stream.Length];
+        stream.Read(bytes, 0, (int)stream.Length);
+
+        await JSRuntime.InvokeAsync<object>("saveAsFile", fileName, Convert.ToBase64String(bytes));
     }
 }

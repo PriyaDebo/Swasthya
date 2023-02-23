@@ -4,7 +4,9 @@ using Common.ApiRequestModels.ReportRequestModels;
 using Common.ApiResponseModels.ReportResponseModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Security.Claims;
+using System.Text;
 
 namespace API.Controllers
 {
@@ -80,7 +82,9 @@ namespace API.Controllers
             }
 
             //var report = await reportOperations.AddReportAsync(User.FindFirstValue(ClaimTypes.email), request.title, request.report);
-            var report = await reportOperations.AddReportAsync(request.email, request.title, request.report);
+            byte[] byteArray = Encoding.UTF8.GetBytes(request.report);
+            using var stream = new MemoryStream(byteArray);
+            var report = await reportOperations.AddReportAsync(request.email, request.title, stream);
             if (report == null)
             {
                 return BadRequest("Failed to add report.");
@@ -110,16 +114,16 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Route("getReportByBlobNameForPatient")]
+        [Route("getReportByBlobNameForPatient/{blobName}")]
         //[Authorize(Constants.PatientPolicy)]
-        public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForPatientAsync(GetReportByBlobNameRequest request)
+        public async Task<ActionResult<ReportStreamResponseModel>> GetReportByBlobNameForPatientAsync(string blobName)
         {
             if(!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var report = await reportOperations.GetReportByBlobNameAsync(request.blobName);
+            var report = await reportOperations.GetReportByBlobNameAsync(blobName);
             return Ok(report.ReportStreamToAPIModel());
         }
     }

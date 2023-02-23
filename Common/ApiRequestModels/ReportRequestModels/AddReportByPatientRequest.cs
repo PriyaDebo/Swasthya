@@ -12,6 +12,6 @@ namespace Common.ApiRequestModels.ReportRequestModels
         public string title { get; set; }
 
         [Required]
-        public Stream report { get; set; }
+        public string report { get; set; }
     }
 }

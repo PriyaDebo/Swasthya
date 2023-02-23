@@ -23,7 +23,15 @@ namespace DAL.Repositories
         {
             var blobName = Guid.NewGuid().ToString();
             var blob = blobContainerClient.GetBlobClient(blobName);
-            await blob.UploadAsync(report);
+            try
+            {
+                await blob.UploadAsync(report);
+            }
+
+            catch (Exception ex)
+            {
+                return null;
+            }
 
             var medicalReport = new ReportData()
             {
@@ -43,7 +51,7 @@ namespace DAL.Repositories
             var blob = blobContainerClient.GetBlobClient(blobName);
             if (await blob.ExistsAsync())
             {
-                await blob.UploadAsync(report);
+                await blob.DownloadToAsync(report);
             }
 
             return report;
@@ -65,7 +73,7 @@ namespace DAL.Repositories
                     {
                         reports.Add(new Report()
                         {
-                            Id = report.Id,
+                            MedicalReport = report.MedicalReport,
                             Title = report.Title,
                         });
                     }
