@@ -1,7 +1,7 @@
-﻿@page "/Medical-Practitioners/Profile/{email}"
+﻿@page "/Hospital/Profile/{email}"
 
-@using Common.ApiResponseModels.DoctorResponseModels;
-@using Common.ApiRequestModels.DoctorRequestModels;
+@using Common.ApiResponseModels.HospitalResponseModels;
+@using Common.ApiRequestModels.HospitalRequestModels;
 @using Operations;
 
 @inject HttpClient http;
@@ -21,66 +21,49 @@
     </div>
     <div class="profile-box">
         <div class="data">
-            Name: @doctor.Name
+            Name: @hospital.Name
         </div>
         <div class="data">
-            Phone Number: @doctor.PhoneNumber
+            Phone Number: @hospital.PhoneNumber
         </div>
         <div class="data">
-            Email: @doctor.Email
+            Email: @hospital.Email
         </div>
         <div class="data">
-            Registration Number: @doctor.RegistrationNumber
+            Address: @hospital.Address
         </div>
-        <div class="data">
-            Swasthya ID: @doctor.SwasthyaId
-        </div>
-        @if (doctor != null)
-        {
-            <img class="qr-code" src="@QRCode" alt="@doctor.SwasthyaId">
-        }
     </div>
 </div>
 
 
 @code {
-    private DoctorResponseModel doctor;
+    private HospitalResponseModel hospital;
     private string baseUri;
     private string errorMessage;
-    private string QRCode;
-    private QRCodeGeneration qrCodeGeneration;
 
     [Parameter]
     public string email { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        doctor = new DoctorResponseModel();
+        hospital = new HospitalResponseModel();
         this.baseUri = Configuration["BackendUri"];
-        await GetPatient();
-        qrCodeGeneration = new QRCodeGeneration();
-        QRCode = await GenerateQrCodeImage();
+        await GetHospital();
     }
 
-    private async Task<string> GenerateQrCodeImage()
+    private async Task GetHospital()
     {
-        var text = doctor.SwasthyaId;
-        return qrCodeGeneration.GenerateQrCodeImage(text);
-    }
-
-    private async Task GetPatient()
-    {
-        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
+        var uriFormat = this.baseUri + @"/api/Hospital/getHospital/{0}";
         var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
 
         try
         {
 
-            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getPatientUri);
+            var response = await http.GetFromJsonAsync<HospitalResponseModel>(getPatientUri);
 
             if (response != null)
             {
-                this.doctor = response;
+                this.hospital = response;
             }
             else
             {

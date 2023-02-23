@@ -6,48 +6,40 @@
 @inject IConfiguration Configuration;
 @inject NavigationManager NavigationManager;
 
-<h1>Hospital</h1>
+<PageTitle>Swasthya - Healthcare Centre</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <span class="instruction-text">
+        Select one.
+    </span>
+    <div class="wrapper-div-middle">
+        <button class="button-image" @onclick="() => NavigateToProfile()">
+            <img class="images" src="./images/Hospital Profile.svg" />
+        </button>
+        <button class="button-image" @onclick="() => NavigateToDoctors()">
+            <img class="images" src="./images/Patients.svg" />
+        </button>
+    </div>
+</div>
 
 @code {
-    private HospitalResponseModel hospital;
-    private string baseUri;
-    private string errorMessage;
-
     [Parameter]
     public string email { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    private void NavigateToProfile()
     {
-        hospital = new HospitalResponseModel();
-        this.baseUri = Configuration["BackendUri"];
-
-        await GetHospital();
+        var pageUrl = "/Hospital/Profile/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 
-    private async Task GetHospital()
+    private void NavigateToDoctors()
     {
-        var uriFormat = this.baseUri + @"/api/Hospital/getHospital/{0}";
-        var getHospitalUri = string.Format(uriFormat, Uri.EscapeDataString(email));
-
-        try
-        {
-
-            var response = await http.GetFromJsonAsync<HospitalResponseModel>(getHospitalUri);
-
-            if (response != null)
-            {
-                this.hospital = response;
-            }
-            else
-            {
-                errorMessage = "An error occurred. Please try again.";
-            }
-
-        }
-
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred : {ex.Message}";
-        }
+        var pageUrl = "/Hospital/Patients/" + email;
+        NavigationManager.NavigateTo(pageUrl);
     }
 }
