@@ -1,0 +1,86 @@
+﻿.wrapper-div {
+    display: flex;
+    width: fit-content;
+    height: 100vh;
+    flex-direction: column;
+    overflow: auto;
+    background: linear-gradient(180deg, #17224D 0%, #156E93 100%);
+}
+
+.wrapper-div-upper {
+    display: flex;
+    width: 100%;
+    height: fit-content;
+    align-content: center;
+    flex-direction: column;
+}
+
+.app-name {
+    color: #FFFFFF;
+    font-size: 2vw;
+    font-weight: 400;
+    font-family: Samarkan;
+    line-height: 4vw;
+    letter-spacing: -0.05vw;
+    text-align: center;
+}
+
+.instruction-text {
+    font-family: 'Poppins';
+    text-align: center;
+    color: #ffffff;
+    font-size: 2vw;
+    font-weight: 400;
+    line-height: 4vw;
+}
+
+.wrapper-div-middle {
+    display: flex;
+    flex-direction: row;
+    flex: auto;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    justify-items: center;
+    justify-self: center;
+    width: 100vw;
+    height: 80vh;
+    padding-bottom: 5vh;
+    padding-left: 5vw;
+    padding-right: 5vw;
+    padding-top: 5vh;
+    gap: 6vw;
+}
+
+.individual {
+    display: flex;
+    height: 70vh;
+    background-repeat: no-repeat;
+    background-image: url("./images/Individual.svg");
+    background-position: center;
+}
+
+.medical-practitioner {
+    display: flex;
+    height: 70vh;
+    background-repeat: no-repeat;
+    background-image: url("./images/Medical Practitioner.svg");
+    background-position: center;
+    overflow: auto;
+}
+
+.healthcare-centre {
+    display: flex;
+    height: 70vh;
+    background-repeat: no-repeat;
+    background-image: url("./images/Healthcare Centre.svg");
+    background-position: center;
+    overflow: auto;
+}
+
+.images {
+    display: flex;
+    height: 70vh;
+    background-repeat: no-repeat;
+    background-position: center;
+    overflow: auto;
+}

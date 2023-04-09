@@ -1,0 +1,50 @@
+﻿@page "/Medical-Practitioner/{email}"
+
+@using Common.ApiResponseModels.DoctorResponseModels;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <span class="instruction-text">
+        Select one.
+    </span>
+    <div class="wrapper-div-middle">
+        <button class="button-image" @onclick="() => NavigateToProfile()">
+            <img class="images" src="./images/Doctor Profile.svg" />
+        </button>
+        <button class="button-image" @onclick="() => NavigateToPatients()">
+            <img class="images" src="./images/Patients.svg" />
+        </button>
+    </div>
+</div>
+
+
+
+@code {
+    private string baseUri;
+    private string errorMessage;
+
+    [Parameter]
+    public string email { get; set; }
+
+    private void NavigateToProfile()
+    {
+        var pageUrl = "/Medical-Practitioners/Profile/" + email;
+        NavigationManager.NavigateTo(pageUrl);
+    }
+
+    private void NavigateToPatients()
+    {
+        var pageUrl = "/Medical-Practitioners/Patients/" + email;
+        NavigationManager.NavigateTo(pageUrl);
+    }
+}

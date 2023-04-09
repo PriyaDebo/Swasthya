@@ -1,0 +1,89 @@
+﻿@page "/login/healthcare-centre"
+
+@using Common.ApiRequestModels.HospitalRequestModels;
+@using BootstrapBlazor.Components;
+@using System.Net;
+@using System.Text.RegularExpressions;
+
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Healthcare Centre Login</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+
+        <span class="hospital-login">
+            Healthcare Centre Login
+        </span>
+
+    </div>
+
+    <div class="form-box">
+        <EditForm Model="hospital" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-element">
+                <label for="Email">Email</label>
+                <InputText id="Email" @bind-Value="hospital.Email" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Password">Password</label>
+                <InputText id="Password" @bind-Value="hospital.Password" class="form-control"></InputText>
+            </div>
+
+            <button class="form-button" type="submit">Login</button>
+
+            <ValidationSummary />
+        </EditForm>
+
+        <a href='/registration/healthcare-centre' class="button"> Don't have an account? Register ⟶ </a>
+    </div>
+</div>
+
+@code {
+    private LoginHospitalRequest hospital;
+
+    private string baseUri;
+    private string errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hospital = new LoginHospitalRequest();
+        this.baseUri = Configuration["BackendUri"];
+    }
+
+    private async void HandleSubmit()
+    {
+        if (!Regex.IsMatch(hospital.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
+        {
+            errorMessage = "Invalid email format";
+            return;
+        }
+
+        var loginUri = this.baseUri + "/api/Hospital/login";
+
+        try
+        {
+            var httpClient = new HttpClient();
+
+            var response = await httpClient.PostAsJsonAsync<LoginHospitalRequest>(loginUri, hospital);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var pageUrl = "/Hospital/" + hospital.Email;
+                NavigationManager.NavigateTo(pageUrl);
+                //NavigationManager.NavigateTo("/Hospital");
+            }
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while logging in: {ex.Message}";
+        }
+    }
+}

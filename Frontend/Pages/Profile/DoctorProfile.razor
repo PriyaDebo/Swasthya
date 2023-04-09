@@ -1,0 +1,97 @@
+﻿@page "/Medical-Practitioners/Profile/{email}"
+
+@using Common.ApiResponseModels.DoctorResponseModels;
+@using Common.ApiRequestModels.DoctorRequestModels;
+@using Operations;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Medical Practitioner</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="profile-details">
+        Profile Details
+    </div>
+    <div class="profile-box">
+        <div class="data">
+            Name: @doctor.Name
+        </div>
+        <div class="data">
+            Phone Number: @doctor.PhoneNumber
+        </div>
+        <div class="data">
+            Email: @doctor.Email
+        </div>
+        <div class="data">
+            Registration Number: @doctor.RegistrationNumber
+        </div>
+        <div class="data">
+            Swasthya ID: @doctor.SwasthyaId
+        </div>
+        @if (doctor != null)
+        {
+            <img class="qr-code" src="@QRCode" alt="@doctor.SwasthyaId">
+        }
+    </div>
+</div>
+
+
+@code {
+    private DoctorResponseModel doctor;
+    private string baseUri;
+    private string errorMessage;
+    private string QRCode;
+    private QRCodeGeneration qrCodeGeneration;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = new DoctorResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+        await GetPatient();
+        qrCodeGeneration = new QRCodeGeneration();
+        QRCode = await GenerateQrCodeImage();
+    }
+
+    private async Task<string> GenerateQrCodeImage()
+    {
+        var text = doctor.SwasthyaId;
+        return qrCodeGeneration.GenerateQrCodeImage(text);
+    }
+
+    private async Task GetPatient()
+    {
+        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
+        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getPatientUri);
+
+            if (response != null)
+            {
+                this.doctor = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+}

@@ -1,0 +1,163 @@
+﻿@page "/registration/individual"
+
+@using Common.ApiRequestModels.PatientRequestModels;
+@using BootstrapBlazor.Components;
+@using System.Net;
+@using System.Text.RegularExpressions;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Individual Registration</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+
+        <span class="individual-registration">
+            Individual Registration
+        </span>
+
+    </div>
+
+    <div class="form-box">
+        <EditForm Model="patient" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-element">
+                <label for="Name">Name</label>
+                <InputText id="Name" @bind-Value="patient.Name" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Email">Email</label>
+                <InputText id="Email" @bind-Value="patient.Email" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="Password">Password</label>
+                <InputText id="Password" @bind-Value="patient.Password" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="PhoneNumber">Phone Number</label>
+                <InputText id="Phone Number" @bind-Value="patient.PhoneNumber" class="form-control"></InputText>
+            </div>
+
+            <div class="form-element">
+                <label for="DateOfBirth">Date Of Birth</label>
+                <InputDate id="DateOfBirth" @bind-Value="Date" class="form-control" max="@DateTime.Today.ToString("yyyy-MM-dd")"></InputDate>
+                @if (true)
+                {
+                    patient.DateOfBirth = Date.ToString("dd/MM/yyyy");
+                }
+            </div>
+
+            <button class="form-button" type="submit">Register</button>
+            <ValidationSummary />
+        </EditForm>
+
+        <a href='/login/individual' class="button"> Already have an account? Login ⟶ </a>
+    </div>
+</div>
+
+@code {
+    private RegisterPatientRequest patient;
+    private LoginPatientRequest loginPatient;
+    private DateOnly Date = DateOnly.FromDateTime(DateTime.Now);
+    private string baseUri;
+    private string errorMessage;
+    private bool showErrorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        patient = new RegisterPatientRequest();
+        loginPatient = new LoginPatientRequest();
+        this.baseUri = Configuration["BackendUri"];
+        showErrorMessage = false;
+    }
+
+    private async void HandleSubmit()
+    {
+        if (!Regex.IsMatch(patient.Email, @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$"))
+        {
+            showErrorMessage = true;
+            errorMessage = "Invalid email format";
+            return;
+        }
+
+        if (!Regex.IsMatch(patient.PhoneNumber, @"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$"))
+        {
+            showErrorMessage = true;
+            errorMessage = "Invalid phone number";
+            return;
+        }
+
+        var registerUri = this.baseUri + "/api/Patient/register";
+
+        try
+        {
+            var httpClient = new HttpClient();
+            var response = await httpClient.PutAsJsonAsync<RegisterPatientRequest>(registerUri, patient);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Login();
+            }
+
+            else if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                showErrorMessage = true;
+                errorMessage = "email already exists";
+            }
+
+            else
+            {
+                showErrorMessage = true;
+                errorMessage = "An error occurred while registering. Please try again.";
+            }
+        }
+
+        catch (Exception ex)
+        {
+            showErrorMessage = true;
+            errorMessage = $"An error occurred while registering: {ex.Message}";
+        }
+    }
+
+    private async void Login()
+    {
+        var httpClientHandler = new HttpClientHandler
+            {
+                UseCookies = true,
+            };
+
+        var loginUri = this.baseUri + "/api/Patient/login";
+
+        loginPatient.Email = patient.Email;
+        loginPatient.Password = patient.Password;
+
+        try
+        {
+
+                var response = await http.PostAsJsonAsync<LoginPatientRequest>(loginUri, loginPatient);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var pageUrl = "/Individual/" + patient.Email;
+                    //NavigationManager.NavigateTo("/Individual");
+                    NavigationManager.NavigateTo(pageUrl);
+                }
+
+        }
+
+        catch (Exception ex)
+        {
+            showErrorMessage = true;
+            errorMessage = $"An error occurred while logging in: {ex.Message}";
+        }
+    }
+}

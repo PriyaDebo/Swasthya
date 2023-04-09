@@ -1,0 +1,104 @@
+﻿@page "/Medical-Practitioners/Patients/{email}"
+
+@using BootstrapBlazor.Components;
+@using Common.ApiRequestModels.DoctorRequestModels;
+@using Common.ApiResponseModels.DoctorResponseModels;
+@using System.Net.Http.Headers;
+@using System.Net;
+@using System.Text;
+@using Microsoft.AspNetCore.Components.WebAssembly;
+
+
+@inject IJSRuntime JSRuntime
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Medical Practitioner</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+
+    <div class="wrapper-div-middle">
+        <div class="patients">
+            Patients
+        </div>
+        @if (doctor.Patients != null)
+        {
+            <div class="patient-details">
+                @foreach (var patient in doctor.Patients)
+                {
+                    <Card class="patient-details">
+                        <BodyTemplate>
+                            <p class="card-text">
+                                Name: @patient.Name <br>
+                                Email: @patient.Email <br>
+                                Phone Number: @patient.PhoneNumber <br>
+                                Swasthya Id: @patient.SwasthyaId <br>
+                            </p>
+                        </BodyTemplate>
+                        <FooterTemplate>
+                            <button class="add-report" @onclick="() => ViewReport(patient.Email)">
+                                View Reports
+                            </button>
+                        </FooterTemplate>
+                    </Card>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private DoctorResponseModel doctor;
+    private string baseUri;
+    private string errorMessage;
+    private string QRCode;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        doctor = new DoctorResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+        await GetDoctor();
+    }
+
+    private async Task GetDoctor()
+    {
+        var uriFormat = this.baseUri + @"/api/Doctor/getDoctor/{0}";
+        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<DoctorResponseModel>(getPatientUri);
+
+            if (response != null)
+            {
+                this.doctor = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+
+    private async Task ViewReport(string patientEmail)
+    {
+        var pageUrl = "/Reports/" + patientEmail;
+        NavigationManager.NavigateTo(pageUrl);
+    }
+}

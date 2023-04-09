@@ -1,0 +1,80 @@
+﻿@page "/Hospital/Profile/{email}"
+
+@using Common.ApiResponseModels.HospitalResponseModels;
+@using Common.ApiRequestModels.HospitalRequestModels;
+@using Operations;
+
+@inject HttpClient http;
+@inject IConfiguration Configuration;
+@inject NavigationManager NavigationManager;
+
+<PageTitle>Swasthya - Medical Practitioner</PageTitle>
+
+<div class="wrapper-div">
+    <div class="wrapper-div-upper">
+        <h1 class="app-name">
+            swasthya
+        </h1>
+    </div>
+    <div class="profile-details">
+        Profile Details
+    </div>
+    <div class="profile-box">
+        <div class="data">
+            Name: @hospital.Name
+        </div>
+        <div class="data">
+            Phone Number: @hospital.PhoneNumber
+        </div>
+        <div class="data">
+            Email: @hospital.Email
+        </div>
+        <div class="data">
+            Address: @hospital.Address
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private HospitalResponseModel hospital;
+    private string baseUri;
+    private string errorMessage;
+
+    [Parameter]
+    public string email { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        hospital = new HospitalResponseModel();
+        this.baseUri = Configuration["BackendUri"];
+        await GetHospital();
+    }
+
+    private async Task GetHospital()
+    {
+        var uriFormat = this.baseUri + @"/api/Hospital/getHospital/{0}";
+        var getPatientUri = string.Format(uriFormat, Uri.EscapeDataString(email));
+
+        try
+        {
+
+            var response = await http.GetFromJsonAsync<HospitalResponseModel>(getPatientUri);
+
+            if (response != null)
+            {
+                this.hospital = response;
+            }
+            else
+            {
+                errorMessage = "An error occurred. Please try again.";
+            }
+
+        }
+
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred : {ex.Message}";
+        }
+    }
+}
